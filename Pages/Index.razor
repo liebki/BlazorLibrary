@@ -1,0 +1,42 @@
+@inject IJSRuntime JS
+@inject FileManager fileMan
+@inject NavigationManager navMan
+
+@page "/"
+
+<h1>Welcome</h1>
+<br />
+<dl class="row">
+    <dt class="col-sm-3">Start</dt>
+        <dd class="col-sm-9">Here you find the help and important messages will be displayed here.</dd>
+    <dt class="col-sm-3">Library</dt>
+        <dd class="col-sm-9">This is the place, containing all of your games!</dd>
+    <dt class="col-sm-3 text-truncate">Add game</dt>
+        <dd class="col-sm-9">Here you can add games.</dd>
+    <dt class="col-sm-3">Manage genre</dt>
+        <dd class="col-sm-9">Here you can create, edit or delete genre.</dd>
+    <dt class="col-sm-3">Import</dt>
+        <dd class="col-sm-9">Here you can import genre and games using .csv files.</dd>
+    <dt class="col-sm-3">Trashcan</dt>
+        <dd class="col-sm-9">Here you can restore or completely delete previously deleted games.</dd>
+
+</dl>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Nachricht { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(!String.IsNullOrEmpty(Nachricht))
+        {
+            ShowModal();   
+        }
+    }
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    void ShowModal() => Modal.Show<Confirm>(Nachricht);
+
+}

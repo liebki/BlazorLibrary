@@ -1,0 +1,45 @@
+{
+    "executable": "BlazorApp",
+    "splashscreen": {
+        "imageFile": ""
+    },
+    "name": "BlazorLibrary",
+    "author": "",
+    "singleInstance": false,
+    "environment": "Production",
+    "build": {
+        "appId": "de.liebki",
+        "productName": "BlazorLibrary",
+        "copyright": "Copyright © 2022",
+        "buildVersion": "0.1.5",
+        "compression": "maximum",
+        "directories": {
+            "output": "../../../bin/Desktop"
+        },
+        "mac": {
+            "icon": "build/logo.icns"
+        },
+        "win": {
+            "icon": "build/logo.png"
+        },
+        "extraResources": [
+            {
+                "from": "./bin",
+                "to": "bin",
+                "filter": [
+                    "**/*"
+                ]
+            }
+        ],
+        "files": [
+            {
+                "from": "./ElectronHostHook/node_modules",
+                "to": "ElectronHostHook/node_modules",
+                "filter": [
+                    "**/*"
+                ]
+            },
+            "**/*"
+        ]
+    }
+}

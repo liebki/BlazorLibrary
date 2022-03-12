@@ -1,0 +1,35 @@
+@inject SQLiteManager _db
+
+@page "/papierkorb"
+
+<h3>Trashcan</h3>
+
+@if (SpieleListe.Count <= 0)
+{
+    <p>There are no games in the trashcan...</p>
+} else
+{
+    <div class="card-deck">
+    @foreach(Spiel s in SpieleListe)
+    {
+        <DeletedGameCard spiel="@s" /> 
+    }
+</div>
+}
+
+@code {
+
+    public List<Spiel> SpieleListe = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await HoleSpiele();
+    }
+
+    public async Task HoleSpiele()
+    {
+        SpieleListe.Clear();
+        SpieleListe = await _db.GeloeschteSpieleListeErhalten();
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,86 @@
+﻿@inject SQLiteManager _db
+@inject NavigationManager navMan
+@inject IJSRuntime jsMan
+
+@code {
+    [Parameter]  
+    public Spiel spiel { get; set; }
+}
+
+<div id="@Manager.CreateModalId(spiel.Name)" class="card m-4" style="background-color:#ffffff; min-width: 18rem; max-width:22%">
+  <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
+    <img src="@spiel.Bildlink" class="img-fluid"/>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title float-left">@spiel.Name</h5>
+    @if(Program.Einstellungen.Userawg) 
+    {
+        <p class="float-right" style="font-size: 14px;">Score: @spiel.Metacritics</p>
+    }
+    <div class="pull-left" style="clear: both;">
+        <p class="card-text BeschreibungUmbruch" style="font-size: 14px;">@spiel.Beschreibung</p>
+        <div class="pull-right" style="clear: both;">
+            @if(Program.Einstellungen.Usepricescraper)
+            {
+                <p class="float-md-right" style="font-size: 14px;">Price: @spiel.Estimatedprice€</p>
+            }
+        </div>
+        <p class="card-text" style="font-size: 14px;" data-toggle="tooltip" data-placement="top" title="@spiel.SterneTooltip">Stars: <SterneDarstellung Sterne="spiel.Sterne" /></p>
+        <p class="card-text" style="font-size: 14px;">Genre: @string.Join(',', Manager.GenreArrayToStringArray(spiel.Genrelist))</p>
+    </div>
+  </div>
+  <div class="card-footer text-center">
+    <button @onclick="@(e => Manager.StartExe(spiel.Exepfad))" class="btn"><i class="oi oi-play-circle" ></i></button>                      
+    <a href="/spielbearbeiten?SpielId=@spiel.Id" class="btn"><i class="oi oi-pencil" ></i></a>                                                                       
+    <button @onclick="SpielLoeschen" class="btn"><i class="oi oi-trash" ></i></button>                                                                               
+    @if(spiel.Fav == 1)                                                                                                                     
+    {
+        <button @onclick="@(() => FavoritSetzen(false))" class="btn"><i class="oi oi-x" ></i></button>
+    } else
+    {
+        <button @onclick="@(() => FavoritSetzen(true))" class="btn"><i class="oi oi-check" ></i></button>
+    }                                                        
+    <button class="btn" @onclick="ShowModal" ><i class="oi oi-thumb-up" ></i></button>   
+    <a href="/spieldrucken?SpielId=@spiel.Id" class="btn" ><i class="oi oi-print"></i></a>
+  </div>
+</div>
+
+@code {
+
+    private async void SpielLoeschen()
+    {
+        await _db.SetSpielDeleteStatus(spiel, true);
+        navMan.NavigateTo("/anzeige", true);
+    }
+
+    private async void FavoritSetzen(bool wert)
+    {
+        await _db.SpielFavoritSetzen(spiel.Id, wert);
+        if(wert) { 
+            spiel.Fav = 1; 
+        } else
+        {
+            spiel.Fav = 0;
+        }
+        StateHasChanged();
+    }
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    Bewertung Bewertung;
+
+    async Task ShowModal()
+    {
+        IModalReference messageForm = Modal.Show<Bewerten>();
+        ModalResult result = await messageForm.Result;
+
+        if (!result.Cancelled)
+        {
+            Bewertung = (Bewertung)result.Data;
+            spiel.Sterne = Bewertung.Sterneanzahl;
+            spiel.SterneTooltip = Bewertung.Sternebewertung;
+            await _db.UpdateSterneForGame(spiel);
+            StateHasChanged();
+        }
+    }
+}

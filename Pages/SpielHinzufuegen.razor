@@ -1,0 +1,104 @@
+
+@inject SQLiteManager _db
+@inject NavigationManager navMan
+@inject FileManager fileMan
+
+@page "/spielhinzufuegen"
+
+<h1>Add game</h1>
+
+<div class="form-group">
+  <label for="namefeld">Name of the game</label>
+  <input @bind="Name" type="text" class="form-control" id="namefeld" placeholder="Name">
+</div>
+
+<div class="form-group">
+  <label for="beschreibungfeld">Description of the game</label>
+  <input @bind="Beschreibung" type="text" class="form-control" id="beschreibungfeld" placeholder="Description">
+</div>
+
+<div class="form-group">
+  <label for="bildfeld">Url to image</label>
+  <input @bind="Bildlink" type="text" class="form-control" id="bildfeld" placeholder="Url to image">
+</div>
+
+<div class="form-group">
+  <label for="pfadfeld">Path to exe file</label>
+  <input @bind="Exepfad" type="text" class="form-control" id="pfadfeld" placeholder="Path to exe file">
+  <br />
+  <button @onclick="SelectExeFile" class="btn btn-primary">Choose file</button>
+</div>
+
+@if(GenreListe.Length > 0)
+{
+    <div class="form-group">
+    <label for="genrefeld">Kategorien</label>
+    <select multiple @bind="AuswahlGenre" class="form-control" id="genrefeld">
+        @foreach (Genre gr in GenreListe)
+        {
+            <option value="@gr.Id">@gr.Name</option>
+        }
+    </select>
+    </div>
+} else
+{
+    <p>There are no genre, add some genre to use them here...</p>
+}
+
+<button @onclick="speichereDaten" class="btn btn-success">Save</button>
+<button href="/anzeige" class="btn btn-danger">Quit</button>
+
+@code {
+
+    public async Task SelectExeFile()
+    {
+        string dateiPfad = await fileMan.DateiDialogOeffnen();
+        if(!string.IsNullOrEmpty(dateiPfad))
+        {
+            Exepfad = dateiPfad;
+            StateHasChanged();
+        }
+    }
+
+    public int[] AuswahlGenre { get; set; } = { };
+    public Genre[] GenreListe { get; set; }
+
+    string Name { get; set; }
+    string Beschreibung { get; set; } = "";
+    string Bildlink { get; set; }
+    string Exepfad { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await HoleDaten();
+    }
+
+    public async Task speichereDaten()
+    {
+        if(!object.Equals(Name,null) && Name.Length > 1)
+        {
+            int SpielId = await _db.CreateGameInDatabase(Name,Beschreibung,Bildlink,Exepfad);
+            //int SpielId = await _db.CreateGameInDatabase(Name,Beschreibung,Bildlink,Exepfad, "", 0,0,0,"","");
+            await _db.RemoveAllGenreOfGame(SpielId);
+            if(AuswahlGenre.Length > 0)
+            {
+                await _db.SaveGenreOfGame(SpielId, AuswahlGenre);
+            }
+            navMan.NavigateTo("/?Nachricht=You created the game " + Name, true); 
+        } else
+        {
+            navMan.NavigateTo("/?Nachricht=An error occured!", true); 
+        }
+
+    }
+
+    private async Task HoleDaten()
+    {
+        Genre[] genreList = await _db.AlleGenreErhalten();
+        if(!object.Equals(null,genreList))
+        {
+            GenreListe = genreList;
+            StateHasChanged();
+        }
+    }
+}

@@ -1,0 +1,127 @@
+@inject SQLiteManager _db
+@inject NavigationManager navMan
+@inject FileManager fileMan
+
+@page "/spieldrucken"
+
+<h1>Print your game</h1>
+
+    <div class="form-floating mb-3">
+      <label for="spielname">Name of the game</label>
+      <p id="spielname">@spiel.Name</p>
+    </div>
+    <br />
+
+    <div class="form-floating">
+      <label for="spielbeschreibung">Description of the game</label>
+      @if(!string.IsNullOrWhiteSpace(spiel.Beschreibung))
+        {
+            <p id="spielname">@spiel.Beschreibung</p>
+        } else
+        {
+            <p id="spielname" class="errorTextEl">There is no description.</p>
+        }
+    </div>
+    <br />
+
+    <div class="form-floating">
+      <label for="spielbild">Picture of the game</label>
+      <br />
+      @if(spiel.Bildlink.StartsWith("http"))
+        {
+            <img id="spielbild" src="@spiel.Bildlink" class="img-rounded druckBildGroesse"> 
+        } else
+        {
+            <p id="spielname" class="errorTextEl">There is no image.</p>
+        }
+    </div>
+    <br />
+
+    <div class="form-floating">
+      <label for="spielsterne">Own rating (stars)</label>
+      @if(spiel.Sterne > 0)
+        {
+            <h6 id="spielsterne"><SterneDarstellung Sterne="@spiel.Sterne"/></h6>
+            <label for="spielbewertung">Own rating (Comment)</label>
+            <h6 id="spielbewertung">@spiel.SterneTooltip</h6>
+        } else
+        {
+            <p id="spielname" class="errorTextEl">There is no rating.</p>
+        }
+    </div>
+
+    @if (Program.Einstellungen.Usepricescraper)
+    {
+      <br />
+    <div class="form-floating">
+      <label for="spielpreis">Estimated price of the game (or addons)</label>
+      @if(!string.IsNullOrWhiteSpace(spiel.Estimatedprice) && !spiel.Estimatedprice.Equals("!"))
+        {
+            <h6 id="spielpreis">@spiel.Estimatedprice</h6>
+        } else
+        {
+            <p id="spielname" class="errorTextEl">There is no price.</p>
+        }
+    </div>  
+    }
+
+    @if(Program.Einstellungen.Userawg)
+    {
+    <br />
+    <div class="form-floating">
+      <label for="spielmetacritics">Last metacritics value</label>
+      @if(!string.IsNullOrWhiteSpace(spiel.Metacritics) && !spiel.Metacritics.Equals("!"))
+        {
+            <h6 id="spielmetacritics">@spiel.Metacritics</h6>
+        } else
+        {
+            <p id="spielname" class="errorTextEl">There is no metacritic value.</p>
+        }
+    </div>  
+    }
+    <br />
+
+    <div class="form-floating">
+      <label for="spielgenre">Genre of the game</label>
+      @if(spiel.Genrelist.Length > 0)
+        {
+            <h6 id="spielgenre">@string.Join(',', Manager.GenreArrayToStringArray(spiel.Genrelist))</h6>
+        } else
+        {
+            <p id="spielname" class="errorTextEl">There are no genre.</p>
+        }
+    </div>
+    <br />
+
+    <button @onclick="DruckeSpiel" class="btn btn-primary">Print me</button>
+    <button @onclick="AbbrechenAction" class="btn btn-primary">Quit</button>
+
+@code { 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string SpielId { get; set; }
+
+    public Spiel spiel { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        spiel = await _db.SpielErhalten(Int32.Parse(SpielId));
+    }
+
+    public void AbbrechenAction()
+    {
+        navMan.NavigateTo("/anzeige", true);
+    }
+
+    public async Task DruckeSpiel()
+    {
+        BrowserWindow mainWindow = Electron.WindowManager.BrowserWindows.First();
+        PrintOptions printOptions = new PrintOptions
+            {
+                Color = true,
+            };
+
+        await mainWindow.WebContents.PrintAsync(printOptions);
+    }
+
+}

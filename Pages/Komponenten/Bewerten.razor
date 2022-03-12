@@ -1,0 +1,47 @@
+﻿<div>
+    <div class="rate col">
+        <input @onclick="() => setzeSterne(5)" type="radio" id="star5" name="rate" value="5" />
+        <label for="star5" title="text">5 Sterne</label>
+        <input @onclick="() => setzeSterne(4)" type="radio" id="star4" name="rate" value="4" />
+        <label for="star4" title="text">4 Sterne</label>
+        <input @onclick="() => setzeSterne(3)" type="radio" id="star3" name="rate" value="3" />
+        <label for="star3" title="text">3 Sterne</label>
+        <input @onclick="() => setzeSterne(2)" type="radio" id="star2" name="rate" value="2" />
+        <label for="star2" title="text">2 Sterne</label>
+        <input @onclick="() => setzeSterne(1)" type="radio" id="star1" name="rate" value="1" />
+        <label for="star1" title="text">1 Sterne</label>
+    </div>
+        <div class="form-group">
+        <label for="bewertunginput">Create a rating:</label>
+        <input @bind="bewertungtooltip" type="email" class="form-control" id="bewertunginput" placeholder="Reason for your rating">
+        <small class="form-text text-muted">The text is visible when hovering over the stars.</small>
+    </div>
+    <p>Zum schließen, drücke auf OK.</p>
+    <button @onclick="FormBeenden" class="btn btn-primary">OK</button>
+</div>
+
+@code {
+
+    string bewertungtooltip { get; set; } = "";
+    Bewertung sterneBewertung { get; set; } = new(0, "");
+
+    public void setzeSterne(int sterne)
+    {
+        auswahl = sterne;
+    }
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; }
+
+    int auswahl { get; set; } = 0;
+
+    protected override void OnInitialized() => BlazoredModal.SetTitle("Rate the game");
+
+    async Task FormBeenden()
+    {    
+        sterneBewertung = new(auswahl, bewertungtooltip);
+        await BlazoredModal.CloseAsync(ModalResult.Ok(sterneBewertung));
+    }
+
+
+
+}

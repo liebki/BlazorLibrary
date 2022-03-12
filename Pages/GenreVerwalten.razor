@@ -1,0 +1,152 @@
+@inject SQLiteManager _db
+@inject NavigationManager navMan
+
+@page "/genreverwalten"
+
+<h1>Manage Genre</h1>
+
+@if(GenreListe.Length > 0)
+{
+    <div class="form-group">
+        <label for="genrefeld">Existing genre</label>
+        <select multiple @bind="AuswahlGenre" class="form-control" id="genrefeld">
+            @foreach (Genre gr in GenreListe)
+            {
+                <option value="@gr.Id">@gr.Name</option>
+            }
+        </select>
+    </div>
+
+    @if (AuswahlGenre.Length >= 1)
+    {
+        <button @onclick="LoescheGenre" class="btn btn-primary">Delete selection</button>
+        <div class="clearfix"></div>
+        <br />
+    }
+
+    @if(AuswahlGenre.Length == 1)
+    {
+        <div class="form-group">
+            <label for="genreaendernfeld">Edit genre</label>
+            <input @bind="editgenre.Name" type="text" class="form-control" id="genreaendernfeld" placeholder="Name of genre">
+        </div>
+        <button @onclick="AendereGenre" class="btn btn-primary">Edit genre</button>
+        <div class="clearfix"></div>
+        <br />
+    }
+
+} else
+{
+    <p>There are no genre, add some genre....</p>
+}
+
+<div class="form-group">
+    <label for="genreerstellfeld">Create genre</label>
+    <input @bind="NeuesGenre" type="text" class="form-control" id="genreerstellfeld" placeholder="Name of genre">
+</div>
+<button @onclick="ErstelleGenre" class="btn btn-primary">Create genre</button>
+
+
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Nachricht { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await HoleDaten();
+        if(!String.IsNullOrEmpty(Nachricht))
+        {
+            ShowModal();   
+        }
+    }
+
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    void ShowModal() => Modal.Show<Confirm>(Nachricht);
+
+
+
+    public string NeuesGenre { get; set; }
+    public int[] auswahlgenre { get; set; } = { };
+    public Genre editgenre { get; set; }
+
+    public int[] AuswahlGenre
+    {
+        get { return auswahlgenre; }
+        set
+        {
+            auswahlgenre = value;
+            if(AuswahlGenre.Length > 0)
+            {
+                editgenre = _db.BestimmtesGenreErhalten(auswahlgenre[0]);
+            }
+        }
+    }
+
+    public async Task AendereGenre()
+    {
+        await _db.RenameGenre(editgenre);
+        navMan.NavigateTo("/genreverwalten?Nachricht=You renamed a genre to " + editgenre.Name, true);
+        await HoleDaten();
+    }
+
+    public Genre[] GenreListe { get; set; }
+
+    public async Task ErstelleGenre()
+    {
+        if(!(NeuesGenre.Length > 0 && string.IsNullOrWhiteSpace(NeuesGenre)))
+        {
+            await _db.CreateGenreInDatabase(NeuesGenre);
+            navMan.NavigateTo("/genreverwalten?Nachricht=You created the genre " + NeuesGenre, true);
+            NeuesGenre = "";
+            await HoleDaten();
+        }
+    }
+
+    public async Task LoescheGenre()
+    {
+        int GenreAnzahlWahl = AuswahlGenre.Count();
+        if(GenreAnzahlWahl >= 0)
+        {
+            bool konflikt = await _db.SpielGenreCheck(AuswahlGenre);
+            if(!konflikt)
+            {
+                string msg = "You deleted the genre ";
+                if(GenreAnzahlWahl > 1)
+                {
+                    msg = "You deleted the genre ";
+                }
+                Genre[] liste = await _db.AlleGenreErhalten();
+                string GenreNamen = "";
+                foreach(int i in AuswahlGenre)
+                {
+                    foreach(Genre genre in liste)
+                    {
+                        if(genre.Id.Equals(i))
+                        {
+                            GenreNamen += genre.Name + " ";
+                        }
+                    }
+                }
+                await _db.DeleteGenreInDatabase(AuswahlGenre);
+                navMan.NavigateTo("/genreverwalten?Nachricht=" + msg + GenreNamen, true);
+                await HoleDaten(); 
+            } else
+            {
+                navMan.NavigateTo("/genreverwalten?Nachricht=Some game(s) still use one or more genre!", true);
+            }
+        }
+    }
+
+    private async Task HoleDaten()
+    {
+        Genre[] genreList = await _db.AlleGenreErhalten();
+        if(!object.Equals(null,genreList))
+        {
+            GenreListe = genreList;
+            StateHasChanged();
+        }
+    }
+}

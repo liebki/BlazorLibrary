@@ -1,0 +1,11 @@
+﻿@code {
+	[Parameter]
+	public int Sterne { get; set; }
+
+}
+
+@for(int i = 0; i < Sterne; i++)
+{
+	<i class="oi oi-star" ></i>
+	<span>&nbsp;</span>
+}

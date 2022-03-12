@@ -1,0 +1,89 @@
+@inject SQLiteManager _db
+
+@page "/anzeige"
+
+<h1>Welcome to your library</h1>
+
+@if (SpieleListe.Count <= 0)
+{
+    <p>There are no games, add some games...</p>
+} else
+{
+    <div class="form-group">
+    <label for="genrefeld">Sort:</label>
+    <select class="form-control" @bind="Filterung">
+        <option value="0" class="dropdown-item">Sort..</option>
+        <option value="1" class="dropdown-item">Genre</option>
+        <option value="2" class="dropdown-item">Genre number</option>
+        <option value="3" class="dropdown-item">Name</option>
+        <option value="4" class="dropdown-item">Favourite</option>
+        <option value="5" class="dropdown-item">Stars</option>
+
+    </select>
+
+    <label for="genrefeld">Sort order:</label>
+    <select class="form-control" @bind="Filterungfolge">
+        <option value="0" class="dropdown-item">Ascending</option>
+        <option value="1" class="dropdown-item">Descending</option>
+    </select>
+</div>
+
+<div class="card-deck">
+    @foreach(Spiel s in SpieleListe)
+    {
+        if(s.Papierkorb == 0)
+        {
+            <NewGameCard spiel="@s" /> 
+        }
+    }
+</div>
+}
+
+@code {
+
+    private int filterung;
+    private int filterungfolge;
+
+    public int Filterung
+    {
+        get { return filterung; }
+        set
+        {
+            filterung = value;
+            SortiereSpiele(filterung);
+        }
+    }
+
+    public int Filterungfolge
+    {
+        get { return filterungfolge; }
+        set
+        {
+            filterungfolge = value;
+            SortiereSpiele(filterung);
+        }
+    }
+
+    public List<Spiel> OriginaleListe = new();
+    public List<Spiel> SpieleListe = new();
+
+    public void SortiereSpiele(int modus)
+    {
+        Manager.KartenFilterungAnzeige(ref modus, ref filterungfolge, ref SpieleListe, ref OriginaleListe);
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await HoleSpiele();
+        OriginaleListe = SpieleListe;
+    }
+
+
+    public async Task HoleSpiele()
+    {
+        SpieleListe.Clear();
+        SpieleListe = await _db.SpieleListeErhalten();
+        StateHasChanged();
+    }
+}

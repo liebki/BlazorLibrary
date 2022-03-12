@@ -1,0 +1,93 @@
+@inject SQLiteManager _db
+@inject NavigationManager navMan
+@inject FileManager fileMan
+
+@page "/spielbearbeiten"
+
+<h1>Edit game</h1>
+
+<div class="form-group">
+  <label for="namefeld">Name</label>
+  <input @bind="Spiel.Name" type="text" class="form-control" id="namefeld" placeholder="Name">
+</div>
+
+<div class="form-group">
+  <label for="beschreibungfeld">Description</label>
+  <input @bind="Spiel.Beschreibung" type="text" class="form-control" id="beschreibungfeld" placeholder="Description">
+</div>
+
+<div class="form-group">
+  <label for="bildfeld">Url to picture</label>
+  <input @bind="Spiel.Bildlink" type="text" class="form-control" id="bildfeld" placeholder="Url to picture">
+</div>
+
+<div class="form-group">
+  <label for="pfadfeld">Path to .exe</label>
+  <input @bind="Spiel.Exepfad" type="text" class="form-control" id="pfadfeld" placeholder="Path to .exe">
+  <br />
+  <button @onclick="SelectExeFile" class="btn btn-primary">Choose file</button>
+</div>
+
+@if(GenreListe.Length > 0)
+{
+    <div class="form-group">
+    <label for="genrefeld">Genre</label>
+    <select multiple @bind="AuswahlGenre" class="form-control" id="genrefeld">
+        @foreach (Genre gr in GenreListe)
+        {
+            <option value="@gr.Id">@gr.Name</option>
+        }
+    </select>
+    </div>
+} else
+{
+    <p>There are no genre, add some genre to use them here...</p>
+}
+
+<button @onclick="speichereDaten" class="btn btn-primary">Save</button>
+<a href="/anzeige" class="btn btn-primary">Quit</a>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string SpielId { get; set; }
+
+    public async Task SelectExeFile()
+    {
+        string dateiPfad = await fileMan.DateiDialogOeffnen();
+        if(!string.IsNullOrEmpty(dateiPfad))
+        {
+            Spiel.Exepfad = dateiPfad;
+            StateHasChanged();
+        }
+    }
+
+    public int[] AuswahlGenre { get; set; } = { };
+    public Genre[] GenreListe { get; set; }
+    public Spiel Spiel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await HoleDaten();
+    }
+
+    public async Task speichereDaten()
+    {
+        await _db.UpdateSpielInDatabase(Spiel);
+        await _db.RemoveAllGenreOfGame(Spiel.Id);
+        await _db.SaveGenreOfGame(Spiel.Id, AuswahlGenre);
+        navMan.NavigateTo("/?Nachricht=You edited the game " + Spiel.Name, true);
+    }
+
+    private async Task HoleDaten()
+    {
+        Spiel spiel = await _db.SpielErhalten(Int32.Parse(SpielId));
+        Genre[] genreList = await _db.AlleGenreErhalten();
+        if(!object.Equals(null,spiel) && !object.Equals(null,genreList))
+        {
+            Spiel = spiel;
+            GenreListe = genreList;
+            StateHasChanged();
+        }
+    }
+}
