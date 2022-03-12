@@ -57,6 +57,10 @@ A library for video games on the computer, created using C#, Bootstrap and Elect
 
 I created this on windows 10 and tested it on other windows 10 machines, I cant guarantee anything for other operating systems or versions.
 
+#### Where do I get an API-Key for rawg.io?
+
+You can apply (get a key) here: https://rawg.io/apidocs
+
 ## License
 
 “Commons Clause” License Condition v1.0
