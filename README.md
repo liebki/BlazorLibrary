@@ -61,6 +61,10 @@ I created this on windows 10 and tested it on other windows 10 machines, I cant 
 
 You can apply (get a key) here: https://rawg.io/apidocs
 
+#### Where do I put my rawg.io API-Key?
+
+Look in the "ApplicationSettingsFile.json" file, under "rawgapikey", just paste it in the brackets, and it should work.
+
 ## License
 
 “Commons Clause” License Condition v1.0
