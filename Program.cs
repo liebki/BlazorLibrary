@@ -11,7 +11,7 @@ namespace BlazorApp
     {
         public static ApplicationSettings Einstellungen { get; set; } = new();
 
-        public static void Main(string[] args)
+        public static void Main()
         {
             Einstellungen = Manager.ReadJsonSettingsFile(File.ReadAllText("ApplicationSettingsFile.json"));
             bool InternetAvailable = Manager.InternetAvailable();
@@ -23,7 +23,7 @@ namespace BlazorApp
                     Einstellungen.Userawg = false;
                 }
                 SQLiteManager.SetupDatabase();
-                CreateHostBuilder(args).Build().Run();
+                CreateHostBuilder(null).Build().Run();
             }
         }
 

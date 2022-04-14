@@ -6,13 +6,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Threading.Tasks;
 
 namespace BlazorApp
 {
     public class Startup
     {
-        private BrowserWindow electronBrowserWindow = null;
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -60,11 +59,11 @@ namespace BlazorApp
             }
         }
 
-        private async void CreateWindow()
+        private static async Task CreateWindow()
         {
-            electronBrowserWindow = await Electron.WindowManager.CreateWindowAsync();
-            electronBrowserWindow.SetMenuBarVisibility(false);
-            electronBrowserWindow.OnClosed += () =>
+            BrowserWindow ElectronBrowserWindow = await Electron.WindowManager.CreateWindowAsync();
+            ElectronBrowserWindow.SetMenuBarVisibility(false);
+            ElectronBrowserWindow.OnClosed += () =>
             {
                 Electron.App.Quit();
             };

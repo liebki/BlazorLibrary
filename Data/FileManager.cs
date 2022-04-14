@@ -20,9 +20,9 @@ namespace BlazorApp.Data
 
             if (!object.Equals(window, null))
             {
-                OpenDialogOptions options = new OpenDialogOptions
+                OpenDialogOptions options = new()
                 {
-                    Title = "Wähle dein Spiel aus.",
+                    Title = "Select a game (exe) file.",
                     Filters = new FileFilter[]
                 {
                 new FileFilter { Name = "EXE", Extensions = new string[] {"exe" } }
@@ -52,9 +52,9 @@ namespace BlazorApp.Data
 
             if (!object.Equals(window, null))
             {
-                OpenDialogOptions options = new OpenDialogOptions
+                OpenDialogOptions options = new()
                 {
-                    Title = "Wähle eine CSV-Datei aus.",
+                    Title = "Select a CSV-File.",
                     Filters = new FileFilter[]
                 {
                 new FileFilter { Name = "CSV", Extensions = new string[] {"csv" } }

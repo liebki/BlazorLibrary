@@ -181,7 +181,7 @@ namespace BlazorApp
         {
             string value = inp;
             value = value.ToLower();
-            value = string.Join("", value.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
+            value = String.Concat(value.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
             char[] charArray = value.ToCharArray();
             Array.Reverse(charArray);
             return new string(charArray);

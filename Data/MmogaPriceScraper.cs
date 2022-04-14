@@ -76,7 +76,7 @@ namespace BlazorApp.Data
                 string[] PriceWithOfferPrice = Price.Split(' ');
                 Price = PriceWithOfferPrice[1];
             }
-            Price = string.Join("", Price.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
+            Price = String.Concat(Price.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
             if (!string.IsNullOrWhiteSpace(Price))
             {
                 ProductPriceList.Add(Price);
