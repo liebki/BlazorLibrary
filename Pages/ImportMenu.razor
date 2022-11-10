@@ -9,85 +9,17 @@
 <h1>Import genre or games</h1>
 
 <div class="input-group mb-3">
-  <input @bind="spielcsv" type="text" class="form-control" placeholder="Choose a .csv file containing game data">
+  <input @bind="spielcsv_state" type="text" class="form-control" placeholder="Choose a .csv file containing game data">
   <div class="input-group-append">
-    <button @onclick="SelectSpielCsv" class="btn btn-outline-secondary" type="button">Select</button>
+    <button @onclick="() => SelectImportCsv(ImportType.Spiel)" class="btn btn-outline-secondary" type="button">Select</button>
   </div>
 </div>
 
 <div class="input-group mb-3">
-  <input @bind="genrecsv" type="text" class="form-control" placeholder="Choose a .csv file containing genre data">
+  <input @bind="genrecsv_state" type="text" class="form-control" placeholder="Choose a .csv file containing genre data">
   <div class="input-group-append">
-    <button @onclick="SelectGenreCsv" class="btn btn-outline-secondary" type="button">Select</button>
+    <button @onclick="() => SelectImportCsv(ImportType.Genre)" class="btn btn-outline-secondary" type="button">Select</button>
   </div>
 </div>
 
 <button @onclick="VerarbeiteDaten" class="btn btn-primary" type="button">Import</button>
-
-@code {
-
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public string Nachricht { get; set; } = "";
-
-    protected override async Task OnInitializedAsync()
-    {
-        if(!String.IsNullOrEmpty(Nachricht))
-        {
-            ShowModal();   
-        }
-    }
-
-    [CascadingParameter] public IModalService Modal { get; set; }
-    void ShowModal() => Modal.Show<Confirm>(Nachricht);
-
-
-
-    public string spielcsv { get; set; } = "";
-    public string genrecsv { get; set; } = "";
-
-    public async Task VerarbeiteDaten()
-    {
-        bool importiert = false;
-        if(!string.IsNullOrEmpty(spielcsv))
-        {
-            List<CsvSpiel> CsvSpieleListe = csvMan.CsvZuSpielListe(spielcsv);
-            await _db.CsvInsertSpieleInDatabase(CsvSpieleListe);
-            importiert = true;
-        }
-        if(!string.IsNullOrEmpty(genrecsv))
-        {
-            List<CsvGenre> CsvGenreListe = csvMan.CsvZuGenreListe(genrecsv);
-            await _db.CsvInsertGenreInDatabase(CsvGenreListe);
-            importiert = true;
-        }
-        if(importiert)
-        {
-            navMan.NavigateTo("/import?Nachricht=You imported data!", true);
-        } else
-        {
-            navMan.NavigateTo("/import?Nachricht=You did not import data!", true);
-        }
-
-    }
-
-    public async Task SelectSpielCsv()
-    {
-        string dateiPfad = await fileMan.CsvDialogOeffnen();
-        if(!string.IsNullOrEmpty(dateiPfad))
-        {
-            spielcsv = dateiPfad;
-            StateHasChanged();
-        }
-    }
-
-    public async Task SelectGenreCsv()
-    {
-        string dateiPfad = await fileMan.CsvDialogOeffnen();
-        if(!string.IsNullOrEmpty(dateiPfad))
-        {
-            genrecsv = dateiPfad;
-            StateHasChanged();
-        }
-    }
-}

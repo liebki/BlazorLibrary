@@ -1,5 +1,5 @@
 {
-    "rawgapikey": "KEY FROM RAWG.IO",
+    "rawgapikey": "API-KEY FROM RAWG.IO",
     "sqlitedatabasename": "gamelibrary",
     "userawg": true,
     "pricescrapermode": "mmoga",

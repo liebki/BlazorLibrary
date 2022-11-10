@@ -1,4 +1,3 @@
-
 @inject SQLiteManager _db
 @inject NavigationManager navMan
 @inject FileManager fileMan
@@ -47,58 +46,3 @@
 
 <button @onclick="speichereDaten" class="btn btn-success">Save</button>
 <button href="/anzeige" class="btn btn-danger">Quit</button>
-
-@code {
-
-    public async Task SelectExeFile()
-    {
-        string dateiPfad = await fileMan.DateiDialogOeffnen();
-        if(!string.IsNullOrEmpty(dateiPfad))
-        {
-            Exepfad = dateiPfad;
-            StateHasChanged();
-        }
-    }
-
-    public int[] AuswahlGenre { get; set; } = { };
-    public Genre[] GenreListe { get; set; }
-
-    string Name { get; set; }
-    string Beschreibung { get; set; } = "";
-    string Bildlink { get; set; }
-    string Exepfad { get; set; } = "";
-
-    protected override async Task OnInitializedAsync()
-    {
-        await HoleDaten();
-    }
-
-    public async Task speichereDaten()
-    {
-        if(!object.Equals(Name,null) && Name.Length > 1)
-        {
-            int SpielId = await _db.CreateGameInDatabase(Name,Beschreibung,Bildlink,Exepfad);
-            //int SpielId = await _db.CreateGameInDatabase(Name,Beschreibung,Bildlink,Exepfad, "", 0,0,0,"","");
-            await _db.RemoveAllGenreOfGame(SpielId);
-            if(AuswahlGenre.Length > 0)
-            {
-                await _db.SaveGenreOfGame(SpielId, AuswahlGenre);
-            }
-            navMan.NavigateTo("/?Nachricht=You created the game " + Name, true); 
-        } else
-        {
-            navMan.NavigateTo("/?Nachricht=An error occured!", true); 
-        }
-
-    }
-
-    private async Task HoleDaten()
-    {
-        Genre[] genreList = await _db.AlleGenreErhalten();
-        if(!object.Equals(null,genreList))
-        {
-            GenreListe = genreList;
-            StateHasChanged();
-        }
-    }
-}

@@ -1,9 +1,10 @@
-﻿using HtmlAgilityPack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
-namespace BlazorApp.Data
+using HtmlAgilityPack;
+
+namespace BlazorLibrary.Data
 {
     public static class MmogaPriceScraper
     {
@@ -18,12 +19,14 @@ namespace BlazorApp.Data
         {
             string GameName = FilteNameInput(gamename);
             string ProductEndPrice = null;
+
             List<string> ProductPriceList = new();
             using (HttpClient client = new())
             {
-                client.DefaultRequestHeaders.UserAgent.ParseAdd(Program.Einstellungen.Pricescraperuseragent);
-                string WebContentResult = "";
-                using (HttpResponseMessage response = client.GetAsync(MmogaSearchUrl + GameName).Result)
+                client.DefaultRequestHeaders.UserAgent.ParseAdd(MauiProgram.Einstellungen.Pricescraperuseragent);
+                string WebContentResult = string.Empty;
+
+                using (HttpResponseMessage response = client.GetAsync($"{MmogaSearchUrl}{GameName}").Result)
                 {
                     WebContentResult = GetUrlResponseString(response);
                 }
@@ -31,11 +34,12 @@ namespace BlazorApp.Data
                 {
                     HtmlDocument doc = new();
                     doc.LoadHtml(WebContentResult);
+
                     int ProductCount = 0;
                     foreach (HtmlNode node in doc.DocumentNode.SelectNodes("//div[@class='searchCont']"))
                     {
                         ProductCount++;
-                        foreach (HtmlNode node2 in doc.DocumentNode.SelectNodes("/html/body/div[2]/div/div[2]/div[2]/div[" + ProductCount + "]/ul/li[3]"))
+                        foreach (HtmlNode node2 in doc.DocumentNode.SelectNodes($"/html/body/div[2]/div/div[2]/div[2]/div[{ProductCount}]/ul/li[3]"))
                         {
                             CheckPriceOfProduct(ProductPriceList, node2);
                         }
@@ -70,7 +74,8 @@ namespace BlazorApp.Data
         private static void CheckPriceOfProduct(List<string> ProductPriceList, HtmlNode node2)
         {
             string Price = node2.InnerText;
-            Price = Price.Replace("&nbsp;&euro;", "");
+            Price = Price.Replace("&nbsp;&euro;", string.Empty);
+
             if (Price.Contains(' '))
             {
                 string[] PriceWithOfferPrice = Price.Split(' ');

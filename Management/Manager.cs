@@ -1,13 +1,22 @@
-﻿using BlazorApp.Data;
-using BlazorApp.Modelle.Application;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
+using System.Text;
 
-namespace BlazorApp
+using BlazorLibrary.Data;
+using BlazorLibrary.Modelle;
+using BlazorLibrary.Modelle.Application;
+using BlazorLibrary.Modelle.Csv;
+
+using Microsoft.AspNetCore.Components;
+
+using Newtonsoft.Json;
+
+namespace BlazorLibrary.Management
 {
     public static class Manager
     {
@@ -29,10 +38,25 @@ namespace BlazorApp
             }
         }
 
+        public static void SaveImage(Stream stream, string path)
+        {
+            using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
+            {
+                stream.CopyTo(fileStream);
+            }
+        }
+
+        public static string MauiProgramActiveDirectory()
+        {
+            string strExeFilePath = Assembly.GetExecutingAssembly().Location;
+            string strWorkPath = Path.GetDirectoryName(strExeFilePath);
+            return strWorkPath;
+        }
+
         public static void AddExternalSource(string name, ref string bild, ref string metacritic, ref string estimatedprice)
         {
             RawgAccessManager rawgMan = new();
-            if (Program.Einstellungen.Usepricescraper)
+            if (MauiProgram.Einstellungen.Usepricescraper)
             {
                 string price = MmogaPriceScraper.GetPreisVonSpiel(name);
                 if (object.Equals(price, null))
@@ -44,7 +68,7 @@ namespace BlazorApp
                     estimatedprice = price;
                 }
             }
-            if (Program.Einstellungen.Userawg)
+            if (MauiProgram.Einstellungen.Userawg)
             {
                 Game RawgGame = rawgMan.RawgGameInformations(name);
                 if (object.Equals(RawgGame, null))
@@ -86,8 +110,10 @@ namespace BlazorApp
         {
             int randomNum = RandomSpielNummer();
             int randomNum2 = RandomSpielNummer();
+
             int randomNum3 = RandomSpielNummer();
             int nummer = randomNum + ((randomNum2 / 4) + (randomNum3 / 2));
+
             return nummer;
         }
 
@@ -95,6 +121,7 @@ namespace BlazorApp
         {
             int number = new Random().Next(1, 999);
             int number2 = new Random(number).Next(1, 999);
+
             int random = number + (number2 / 2);
             return random;
         }
@@ -172,6 +199,102 @@ namespace BlazorApp
             return result;
         }
 
+        public static async Task MauiDialog(string title = "Window", string message = "Message", string buttontext = "OK")
+        {
+            await Application.Current.MainPage.DisplayAlert(title, message, buttontext);
+        }
+
+        public static async Task<string> ReadStringFromFile(string pickername = "Datei wählen")
+        {
+            StringBuilder ret = new();
+
+            PickOptions options = new()
+            {
+                PickerTitle = pickername
+            };
+
+            try
+            {
+                FileResult result = await FilePicker.Default.PickAsync(options);
+                if (result != null)
+                {
+                    Stream stream = await result.OpenReadAsync();
+                    byte[] b = new byte[1024];
+
+                    UTF8Encoding temp = new(true);
+
+                    while (stream.Read(b, 0, b.Length) > 0)
+                    {
+                        ret.Append(temp.GetString(b));
+                    }
+
+                    stream.Flush();
+                    stream.Position = 0;
+
+                }
+                return ret.ToString();
+            }
+            catch (Exception ex)
+            {
+                // The user canceled or something went wrong
+            }
+
+            return ret.ToString();
+        }
+
+        public static async Task<FileResult> GetExecuteablePath(string pickername = "Spieldatei wählen")
+        {
+            PickOptions options = new()
+            {
+                PickerTitle = pickername
+            };
+
+            try
+            {
+                FileResult result = await FilePicker.Default.PickAsync(options);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                // The user canceled or something went wrong
+            }
+
+            return null;
+        }
+
+        public static async Task<StreamReader> ReadStreamFromFile(string pickername = "Datei wählen")
+        {
+            StreamReader ret = null;
+
+            PickOptions options = new()
+            {
+                PickerTitle = pickername
+            };
+
+            try
+            {
+                FileResult result = await FilePicker.Default.PickAsync(options);
+                if (result != null)
+                {
+                    Stream stream = await result.OpenReadAsync();
+                    stream.Flush();
+
+                    ret = new(stream);
+                    stream.Position = 0;
+                }
+                return ret;
+            }
+            catch (Exception ex)
+            {
+                // The user canceled or something went wrong
+            }
+
+            return ret;
+        }
+
         public static ApplicationSettings ReadJsonSettingsFile(string json)
         {
             return JsonConvert.DeserializeObject<ApplicationSettings>(json);
@@ -181,8 +304,10 @@ namespace BlazorApp
         {
             string value = inp;
             value = value.ToLower();
+
             value = String.Concat(value.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
             char[] charArray = value.ToCharArray();
+
             Array.Reverse(charArray);
             return new string(charArray);
         }
@@ -191,9 +316,13 @@ namespace BlazorApp
         {
             ProcessStartInfo startInfo = new();
             startInfo.CreateNoWindow = true;
-            startInfo.UseShellExecute = false;
+
+            startInfo.WorkingDirectory = $"C:\\users\\{Environment.UserName}\\Desktop\\";
+            startInfo.UseShellExecute = true;
+
             startInfo.FileName = exepfad;
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+
             using (Process process = Process.Start(startInfo))
             {
                 process.Start();

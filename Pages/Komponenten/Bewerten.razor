@@ -19,29 +19,3 @@
     <p>Zum schließen, drücke auf OK.</p>
     <button @onclick="FormBeenden" class="btn btn-primary">OK</button>
 </div>
-
-@code {
-
-    string bewertungtooltip { get; set; } = "";
-    Bewertung sterneBewertung { get; set; } = new(0, "");
-
-    public void setzeSterne(int sterne)
-    {
-        auswahl = sterne;
-    }
-
-    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; }
-
-    int auswahl { get; set; } = 0;
-
-    protected override void OnInitialized() => BlazoredModal.SetTitle("Rate the game");
-
-    async Task FormBeenden()
-    {    
-        sterneBewertung = new(auswahl, bewertungtooltip);
-        await BlazoredModal.CloseAsync(ModalResult.Ok(sterneBewertung));
-    }
-
-
-
-}

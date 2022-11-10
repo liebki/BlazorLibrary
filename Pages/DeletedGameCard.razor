@@ -1,17 +1,12 @@
 ﻿@inject SQLiteManager _db
 @inject NavigationManager navMan
 
-@code {
-    [Parameter]  
-    public Spiel spiel { get; set; }
-}
-
-<div id="@Manager.CreateModalId(spiel.Name)" class="card m-4" style="background-color:#ffffff; min-width: 18rem; max-width:22%">
+<div id="@Manager.CreateModalId(SelectedGame.Name)" class="card m-4" style="background-color:#ffffff; min-width: 18rem; max-width:22%">
   <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
-    <img src="@spiel.Bildlink" class="img-fluid"/>
+    <img src="@SelectedGame.Bildlink" class="img-fluid"/>
   </div>
   <div class="card-body">
-    <h5 class="card-title float-left">@spiel.Name</h5>
+    <h5 class="card-title float-left">@SelectedGame.Name</h5>
   </div>
   <div class="card-footer">               
     <div class="text-center">
@@ -20,20 +15,3 @@
    </div>                                                              
   </div>
 </div>
-
-@code {
-
-    private async void SpielWiederherstellen()
-    {
-        await _db.SetSpielDeleteStatus(spiel, false);
-        navMan.NavigateTo("/anzeige", true);
-    }
-
-    private async void SpielEndgueltigLoeschen()
-    {
-        await _db.RemoveAllGenreOfGame(spiel.Id);
-        await _db.DeleteSpielCompletely(spiel);
-        navMan.NavigateTo("/anzeige", true);
-    }
-
-}

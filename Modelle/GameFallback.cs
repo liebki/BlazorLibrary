@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BlazorApp.Modelle
+namespace BlazorLibrary.Modelle
 {
     public partial class GameFallback
     {

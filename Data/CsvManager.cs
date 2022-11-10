@@ -1,69 +1,84 @@
-﻿using BlazorApp.Modelle.Csv;
-using CsvHelper;
-using CsvHelper.Configuration;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace BlazorApp.Data
+
+using CsvHelper;
+using CsvHelper.Configuration;
+using BlazorLibrary.Modelle.Csv;
+using Microsoft.SqlServer.Server;
+using System.Reflection.PortableExecutable;
+using System.Text;
+
+namespace BlazorLibrary.Data
 {
     public class CsvManager
     {
-        public List<CsvSpiel> CsvZuSpielListe(string csvPath)
+        public List<object> CsvStreamReaderToObjects<T>(StreamReader CsvDateiInhalt)
         {
-            List<CsvSpiel> SpieleListe = new();
-            using (StreamReader reader = new(csvPath))
-            using (CsvReader csv = new(reader, GetConfiguration()))
+            List<object> RetList = new();
+
+            using (CsvReader csv = new(CsvDateiInhalt, GetConfiguration()))
             {
                 csv.Read();
                 csv.ReadHeader();
-                while (csv.Read())
+
+                if (typeof(CsvSpiel).IsAssignableFrom(typeof(T)))
                 {
-                    string Name = csv.GetField("Name");
-                    if (!object.Equals(Name, null) && !string.IsNullOrWhiteSpace(Name))
-                    {
-                        string Beschreibung = csv.GetField("Beschreibung");
-                        string Bildlink = csv.GetField("Bildlink");
-                        string Exepfad = csv.GetField("Exepfad");
-                        CsvSpiel spiel = new(Name, Beschreibung, Bildlink, Exepfad);
-                        SpieleListe.Add(spiel);
-                    }
+                    ProcessCsvSpielEntries(RetList, csv);
                 }
+
+                if (typeof(CsvGenre).IsAssignableFrom(typeof(T)))
+                {
+                    ProcessCsvGenreEntries(RetList, csv);
+                }
+
             }
-            return SpieleListe;
+            return RetList;
         }
 
-        public List<CsvGenre> CsvZuGenreListe(string csvPath)
+        private static void ProcessCsvGenreEntries(List<object> RetList, CsvReader csv)
         {
-            List<CsvGenre> GenreListe = new();
-            using (StreamReader reader = new(csvPath))
-            using (CsvReader csv = new(reader, GetConfiguration()))
+            while (csv.Read())
             {
-                csv.Read();
-                csv.ReadHeader();
-                while (csv.Read())
+                string Name = csv.GetField("Name");
+                if (!object.Equals(Name, null) && !string.IsNullOrWhiteSpace(Name))
                 {
-                    string Name = csv.GetField("Name");
-                    if (!object.Equals(Name, null) && !string.IsNullOrWhiteSpace(Name))
-                    {
-                        CsvGenre genre = new(Name);
-                        GenreListe.Add(genre);
-                    }
+                    CsvGenre genre = new(Name);
+                    RetList.Add(genre);
                 }
             }
-            return GenreListe;
+        }
+
+        private static void ProcessCsvSpielEntries(List<object> RetList, CsvReader csv)
+        {
+            while (csv.Read())
+            {
+                string Name = csv.GetField("Name");
+                if (!object.Equals(Name, null) && !string.IsNullOrWhiteSpace(Name))
+                {
+                    string Beschreibung = csv.GetField("Beschreibung");
+                    string Bildlink = csv.GetField("Bildlink");
+
+                    string Exepfad = csv.GetField("Exepfad");
+                    CsvSpiel spiel = new(Name, Beschreibung, Bildlink, Exepfad);
+
+                    RetList.Add(spiel);
+                }
+            }
         }
 
         private static CsvConfiguration GetConfiguration()
         {
             CsvConfiguration configuration = new(CultureInfo.CurrentCulture)
             {
+                Delimiter= ",",
                 HasHeaderRecord = true,
                 HeaderValidated = null,
                 MissingFieldFound = null,
                 IgnoreBlankLines = true,
-                ShouldSkipRecord = record => record.Record.All(string.IsNullOrWhiteSpace)
+                ShouldSkipRecord = record => record.Row.Parser.Record.All(string.IsNullOrWhiteSpace)
             };
             return configuration;
         }

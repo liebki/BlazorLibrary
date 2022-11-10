@@ -2,25 +2,20 @@
 @inject NavigationManager navMan
 @inject IJSRuntime jsMan
 
-@code {
-    [Parameter]  
-    public Spiel spiel { get; set; }
-}
-
 <div id="@Manager.CreateModalId(spiel.Name)" class="card m-4" style="background-color:#ffffff; min-width: 18rem; max-width:22%">
   <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
     <img src="@spiel.Bildlink" class="img-fluid"/>
   </div>
   <div class="card-body">
     <h5 class="card-title float-left">@spiel.Name</h5>
-    @if(Program.Einstellungen.Userawg) 
-    {
+        @if (MauiProgram.Einstellungen.Userawg)
+        {
         <p class="float-right" style="font-size: 14px;">Score: @spiel.Metacritics</p>
     }
     <div class="pull-left" style="clear: both;">
         <p class="card-text BeschreibungUmbruch" style="font-size: 14px;">@spiel.Beschreibung</p>
         <div class="pull-right" style="clear: both;">
-            @if(Program.Einstellungen.Usepricescraper)
+                @if (MauiProgram.Einstellungen.Usepricescraper)
             {
                 <p class="float-md-right" style="font-size: 14px;">Price: @spiel.Estimatedprice€</p>
             }
@@ -44,43 +39,3 @@
     <a href="/spieldrucken?SpielId=@spiel.Id" class="btn" ><i class="oi oi-print"></i></a>
   </div>
 </div>
-
-@code {
-
-    private async void SpielLoeschen()
-    {
-        await _db.SetSpielDeleteStatus(spiel, true);
-        navMan.NavigateTo("/anzeige", true);
-    }
-
-    private async void FavoritSetzen(bool wert)
-    {
-        await _db.SpielFavoritSetzen(spiel.Id, wert);
-        if(wert) { 
-            spiel.Fav = 1; 
-        } else
-        {
-            spiel.Fav = 0;
-        }
-        StateHasChanged();
-    }
-
-    [CascadingParameter] public IModalService Modal { get; set; }
-
-    Bewertung Bewertung;
-
-    async Task ShowModal()
-    {
-        IModalReference messageForm = Modal.Show<Bewerten>();
-        ModalResult result = await messageForm.Result;
-
-        if (!result.Cancelled)
-        {
-            Bewertung = (Bewertung)result.Data;
-            spiel.Sterne = Bewertung.Sterneanzahl;
-            spiel.SterneTooltip = Bewertung.Sternebewertung;
-            await _db.UpdateSterneForGame(spiel);
-            StateHasChanged();
-        }
-    }
-}

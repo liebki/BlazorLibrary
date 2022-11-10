@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BlazorApp.Modelle.Application
+namespace BlazorLibrary.Modelle.Application
 {
     public class ApplicationSettings
     {

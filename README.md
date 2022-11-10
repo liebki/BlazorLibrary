@@ -1,34 +1,48 @@
 # BlazorLibrary
-A library for video games on the computer, created using C#, Bootstrap and Electron.
+A library for video games on the computer, created using .NET Core 7.0 with MAUI and Blazor!
+
 ## Technologies
 
 ### Created using
-- Blazor-Server based on .NET Core 6.0
+- Blazor-Server based on .NET Core 7.0
     - Bootstrap 4.3.1
     - JQuery 3.3.1
     - PopperJs 1.14.7
 
 ### Nuget(s)
-- Blazored.Modal
-- CsvHelper
-- ElectronNet.API
-- HtmlAgilityPack
-- System.Data.SQlite
+Microsoft.Windows.SDK.BuildTools             10.0.22621.1
+Microsoft.AspNetCore.Components.WebView.Maui 7.0.49      
+Blazored.Modal                               7.1.0       
+Microsoft.Extensions.DependencyInjection     7.0.0       
+HtmlAgilityPack                              1.11.46     
+System.Data.SQLite                           1.0.116     
+Microsoft.Extensions.Logging                 7.0.0       
+CsvHelper                                    30.0.0      
+Microsoft.Extensions.Logging.Abstractions    7.0.0       
+Newtonsoft.Json                              13.0.1      
+Microsoft.WindowsAppSDK                      1.1.5       
+Microsoft.Maui.Graphics.Win2D.WinUI.Desktop  7.0.49      
+Microsoft.Maui.Graphics                      7.0.49      
+Microsoft.Extensions.Logging.Debug           7.0.0       
+Microsoft.Extensions.Configuration           7.0.0    
 
 ### External Sources (API's)
-- MMOGA - Used for prices (Wrote some price scraper, not beautiful and not very accurate atm.)
-- Rawg.io - Used for pictures and metacritic-value of games.
+- MMOGA 
+    - Pricing (If game is found)
+- Rawg.io 
+    - Pictures and metacritic-value (If game is found)
+
 ## Features
 
 ### General
-- Scroll through all added games in your library
-- Save created games and game genre in a sqlite file
+- Keep a library of your games, with images, genre etc.
 
 ### Games
 - Add games with (name, description, picture (GIF's work), path to executeable and one or more genre)
 - Edit and delete games
 - Add games using .csv file import
 - Recover games that you deleted from the trashcan or delete them completely
+
 #####
 - Gamescards (Detailed)
     - Start games using the executeable
@@ -85,15 +99,18 @@ For purposes of the foregoing, “Sell” means practicing any or all of the rig
 ## Screenshots
 
 ![Library Example Picture](https://kmliebl.de/blazorlibraryscreenshots/library-ow.png)
-
+(Old, before MAUI port, new one will follow if everything works as planned)
 
 ## Roadmap
 
-- Remove or upgrade print function
-- Change icons of electron-shell
-- Reduce or optimize code (in general)
+1.
+- Wishlist
+- Change API-Key, etc. basically edit config while app is running in an interface!
+
+2.
+- Remove or upgrade print function (hell on earth in maui, I can tell you)
+- Reduce or optimize code (in general) (with maui?)
 - Change rating menu
-- Enhance and integrate better mmoga scraper (for all languages)
+- Integrate mmoga and rawg api (now that I created those two)
 - Language files, to change language
 - Integrate platforms like steam and such
-- More to come..

@@ -1,15 +1,18 @@
-﻿using BlazorApp.Modelle.Csv;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Threading.Tasks;
 
-namespace BlazorApp.Data
+using BlazorLibrary.Management;
+using BlazorLibrary.Modelle;
+using BlazorLibrary.Modelle.Csv;
+
+namespace BlazorLibrary.Data
 {
     public class SQLiteManager
     {
-        private static readonly string sqliteConString = "Data Source=" + Program.Einstellungen.Sqlitedatabasename + ".sqlite;Version=3;";
+        private static readonly string sqliteConString = $"Data Source={Path.Combine(Manager.MauiProgramActiveDirectory(), MauiProgram.Einstellungen.Sqlitedatabasename)}.sqlite;Version=3;";
 
         public static void SetupDatabase()
         {
@@ -56,6 +59,7 @@ namespace BlazorApp.Data
         {
             Manager.RemoveNullValues(ref beschreibung, ref exepfad);
             Manager.AddExternalSource(name, ref bild, ref metacritic, ref estimatedprice);
+
             int spieldbid = Manager.RandomSpielNummer();
             using (SQLiteConnection con = HoleConnnection())
             {
@@ -64,16 +68,22 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "INSERT INTO spiele (id, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice) VALUES(@Id, @Name, @Beschreibung, @Bild, @Exepfad, @Sternetooltip, @Favorit, @Sterne, @Papierkorb, @Metacritic, @Estimatedprice)";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@Id", spieldbid));
                     comm.Parameters.Add(new("@Name", name));
+
                     comm.Parameters.Add(new("@Beschreibung", beschreibung));
                     comm.Parameters.Add(new("@Bild", bild));
+
                     comm.Parameters.Add(new("@Exepfad", exepfad));
                     comm.Parameters.Add(new("@Sternetooltip", sternetooltip));
+
                     comm.Parameters.Add(new("@Favorit", favorit));
                     comm.Parameters.Add(new("@Sterne", sterne));
+
                     comm.Parameters.Add(new("@Papierkorb", papierkorb));
                     comm.Parameters.Add(new("@Metacritic", metacritic));
+
                     comm.Parameters.Add(new("@Estimatedprice", estimatedprice));
                     comm.ExecuteNonQueryAsync();
                 }
@@ -85,8 +95,10 @@ namespace BlazorApp.Data
         {
             string metacritic = "!";
             string estimatedprice = "!";
+
             string bild = spiel.Bildlink;
             Manager.AddExternalSource(spiel.Name, ref bild, ref metacritic, ref estimatedprice);
+
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
@@ -94,12 +106,16 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "UPDATE spiele SET name=@Name, beschreibung=@Beschreibung, bildlink=@Bildlink, exepfad=@Exepfad, metacritic=@Metacritic, estimatedprice=@Estimatedprice WHERE id=@Id";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@Name", spiel.Name));
                     comm.Parameters.Add(new("@Beschreibung", spiel.Beschreibung));
+
                     comm.Parameters.Add(new("@Bildlink", bild));
                     comm.Parameters.Add(new("@Exepfad", spiel.Exepfad));
+
                     comm.Parameters.Add(new("@Metacritic", metacritic));
                     comm.Parameters.Add(new("@Estimatedprice", estimatedprice));
+
                     comm.Parameters.Add(new("@Id", spiel.Id));
                     await comm.ExecuteNonQueryAsync();
                 }
@@ -115,8 +131,10 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "UPDATE spiele SET sterne=@Sterne, sternetooltip=@Sternetooltip WHERE id=@Id";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@Sterne", spiel.Sterne));
                     comm.Parameters.Add(new("@Sternetooltip", spiel.SterneTooltip));
+
                     comm.Parameters.Add(new("@Id", spiel.Id));
                     await comm.ExecuteNonQueryAsync();
                 }
@@ -134,8 +152,10 @@ namespace BlazorApp.Data
                     {
                         comm.CommandText = "INSERT INTO spielgenre (spielid,genreid) VALUES(@Spielid,@Genreid)";
                         comm.CommandType = CommandType.Text;
+
                         comm.Parameters.Add(new("@Spielid", spielid));
                         comm.Parameters.Add(new("@Genreid", IdGenre));
+
                         await comm.ExecuteNonQueryAsync();
                     }
                 }
@@ -157,8 +177,10 @@ namespace BlazorApp.Data
                         {
                             comm.CommandText = "SELECT COUNT(*) FROM spielgenre WHERE spielid=@spielid AND genreid=@genreid;";
                             comm.CommandType = CommandType.Text;
+
                             comm.Parameters.Add(new("@spielid", spiel.Id));
                             comm.Parameters.Add(new("@genreid", IdGenre));
+
                             SQLiteDataReader r = comm.ExecuteReader();
                             while (r.Read())
                             {
@@ -189,8 +211,10 @@ namespace BlazorApp.Data
                     }
                     comm.CommandText = "UPDATE spiele SET papierkorb=@Papierkorb WHERE id=@Id";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@Papierkorb", papierkorbstatus));
                     comm.Parameters.Add(new("@Id", spiel.Id));
+
                     await comm.ExecuteNonQueryAsync();
                 }
             }
@@ -205,6 +229,7 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "DELETE FROM spiele WHERE id=@Id";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@Id", spiel.Id));
                     await comm.ExecuteNonQueryAsync();
                 }
@@ -222,6 +247,7 @@ namespace BlazorApp.Data
                     {
                         comm.CommandText = "DELETE FROM genre WHERE id=@Id";
                         comm.CommandType = CommandType.Text;
+
                         comm.Parameters.Add(new("@Id", IdGenre));
                         await comm.ExecuteNonQueryAsync();
                     }
@@ -239,8 +265,10 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "INSERT INTO genre (id,name) VALUES (@genreid,@genrename)";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@genreid", genreid));
                     comm.Parameters.Add(new("@genrename", name));
+
                     await comm.ExecuteNonQueryAsync();
                 }
             }
@@ -255,6 +283,7 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "DELETE FROM spielgenre WHERE spielid=@Id";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@Id", spielid));
                     await comm.ExecuteNonQueryAsync();
                 }
@@ -272,8 +301,10 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "UPDATE spiele SET favorit=@favwert WHERE id=@spielid";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@favwert", favwert));
                     comm.Parameters.Add(new("@spielid", spielid));
+
                     await comm.ExecuteNonQueryAsync();
                 }
             }
@@ -288,8 +319,10 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "UPDATE genre SET name=@Name WHERE id=@Id";
                     comm.CommandType = CommandType.Text;
+
                     comm.Parameters.Add(new("@Name", genre.Name));
                     comm.Parameters.Add(new("@Id", genre.Id));
+
                     await comm.ExecuteNonQueryAsync();
                 }
             }
@@ -297,7 +330,7 @@ namespace BlazorApp.Data
 
         public Genre BestimmtesGenreErhalten(int genreid)
         {
-            string genrename = "";
+            string genrename = string.Empty;
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
@@ -305,6 +338,7 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "SELECT name FROM genre WHERE id=@Id";
                     comm.Parameters.Add(new("@Id", genreid));
+
                     SQLiteDataReader r = comm.ExecuteReader();
                     while (r.Read())
                     {
@@ -326,10 +360,12 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "SELECT id, name FROM genre";
                     SQLiteDataReader r = comm.ExecuteReader();
+
                     while (r.Read())
                     {
                         int id = (int)r["id"];
                         string name = (string)r["name"];
+
                         genreList.Add(new Genre(id, name));
                     }
                 }
@@ -347,6 +383,7 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "SELECT genre.name FROM spielgenre JOIN spiele ON spielgenre.spielid = spiele.id JOIN genre ON spielgenre.genreid = genre.id WHERE spiele.id=@spielid";
                     comm.Parameters.Add(new("@spielid", spielid));
+
                     SQLiteDataReader r = comm.ExecuteReader();
                     while (r.Read())
                     {
@@ -368,11 +405,13 @@ namespace BlazorApp.Data
                 {
                     comm.CommandText = "SELECT genre.id, genre.name FROM spielgenre JOIN spiele ON spielgenre.spielid = spiele.id JOIN genre ON spielgenre.genreid = genre.id WHERE spiele.id=@spielid";
                     comm.Parameters.Add(new("@spielid", spielid));
+
                     SQLiteDataReader r = comm.ExecuteReader();
                     while (r.Read())
                     {
                         int id = (int)r["id"];
                         string name = (string)r["name"];
+
                         genreList.Add(new Genre(id, name));
                     }
                 }
@@ -390,21 +429,28 @@ namespace BlazorApp.Data
                 {
                     fmd.CommandText = "SELECT id, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice FROM spiele WHERE id=@SpielId";
                     fmd.Parameters.Add(new("@spielid", SpielId));
+
                     SQLiteDataReader r = fmd.ExecuteReader();
                     while (r.Read())
                     {
                         int id = (int)r["id"];
                         string name = (string)r["name"];
+
                         string beschreibung = (string)r["beschreibung"];
                         string bildlink = (string)r["bildlink"];
+
                         string exepfad = (string)r["exepfad"];
                         string sternetooltip = (string)r["sternetooltip"];
+
                         int fav = (int)r["favorit"];
                         int sterne = (int)r["sterne"];
+
                         int papierkorb = (int)r["papierkorb"];
                         string metacritic = (string)r["metacritic"];
+
                         string estimatedprice = (string)r["estimatedprice"];
                         Genre[] genrelist = GenreArrayVonSpielErhalten(id);
+
                         spiel = new(id, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, papierkorb, metacritic, estimatedprice, genrelist);
                     }
                 }
@@ -422,20 +468,27 @@ namespace BlazorApp.Data
                 {
                     fmd.CommandText = "SELECT id, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice FROM spiele";
                     SQLiteDataReader r = fmd.ExecuteReader();
+
                     while (r.Read())
                     {
                         int id = (int)r["id"];
                         string name = (string)r["name"];
+
                         string beschreibung = (string)r["beschreibung"];
-                        string bildlink = (string)r["bildlink"];
+                        string bildlink = ConvertFromDBVal<string>(r["bildlink"]);
+
                         string exepfad = (string)r["exepfad"];
                         string sternetooltip = (string)r["sternetooltip"];
+
                         int fav = (int)r["favorit"];
                         int sterne = (int)r["sterne"];
+
                         int papierkorb = (int)r["papierkorb"];
                         string metacritic = (string)r["metacritic"];
+
                         string estimatedprice = (string)r["estimatedprice"];
                         Genre[] genrelist = GenreArrayVonSpielErhalten(id);
+
                         spiele.Add(new Spiel(id, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, papierkorb, metacritic, estimatedprice, genrelist));
                     }
                 }
@@ -457,16 +510,22 @@ namespace BlazorApp.Data
                     {
                         int id = (int)r["id"];
                         string name = (string)r["name"];
+
                         string beschreibung = (string)r["beschreibung"];
                         string bildlink = (string)r["bildlink"];
+
                         string exepfad = (string)r["exepfad"];
                         string sternetooltip = (string)r["sternetooltip"];
+
                         int fav = (int)r["favorit"];
                         int sterne = (int)r["sterne"];
+
                         int papierkorb = (int)r["papierkorb"];
                         string metacritic = (string)r["metacritic"];
+
                         string estimatedprice = (string)r["estimatedprice"];
                         Genre[] genrelist = GenreArrayVonSpielErhalten(id);
+
                         spiele.Add(new Spiel(id, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, papierkorb, metacritic, estimatedprice, genrelist));
                     }
                 }
@@ -484,6 +543,18 @@ namespace BlazorApp.Data
                     comm.CommandText = cmd;
                     await comm.ExecuteNonQueryAsync();
                 }
+            }
+        }
+
+        public static T ConvertFromDBVal<T>(object obj)
+        {
+            if (obj == null || obj == DBNull.Value)
+            {
+                return default(T); // returns the default value for the type
+            }
+            else
+            {
+                return (T)obj;
             }
         }
     }

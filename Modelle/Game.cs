@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace BlazorApp
+using Newtonsoft.Json;
+
+namespace BlazorLibrary.Modelle
 {
     public class Game
     {

@@ -1,4 +1,4 @@
-﻿namespace BlazorApp.Modelle.Csv
+﻿namespace BlazorLibrary.Modelle.Csv
 {
     public class CsvGenre
     {

@@ -1,4 +1,4 @@
-﻿namespace BlazorApp.Modelle
+﻿namespace BlazorLibrary.Modelle
 {
     public class Bewertung
     {

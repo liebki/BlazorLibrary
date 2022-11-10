@@ -12,24 +12,7 @@
     <div class="card-deck">
     @foreach(Spiel s in SpieleListe)
     {
-        <DeletedGameCard spiel="@s" /> 
+        <DeletedGameCard SelectedGame="s" /> 
     }
 </div>
-}
-
-@code {
-
-    public List<Spiel> SpieleListe = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await HoleSpiele();
-    }
-
-    public async Task HoleSpiele()
-    {
-        SpieleListe.Clear();
-        SpieleListe = await _db.GeloeschteSpieleListeErhalten();
-        StateHasChanged();
-    }
 }

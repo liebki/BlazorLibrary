@@ -1,7 +1,7 @@
-[Open Iconic v1.1.1](http://useiconic.com/open)
+[Open Iconic v1.1.1](https://github.com/iconic/open-iconic)
 ===========
 
-### Open Iconic is the open source sibling of [Iconic](http://useiconic.com). It is a hyper-legible collection of 223 icons with a tiny footprint&mdash;ready to use with Bootstrap and Foundation. [View the collection](http://useiconic.com/open#icons)
+### Open Iconic is the open source sibling of [Iconic](https://github.com/iconic/open-iconic). It is a hyper-legible collection of 223 icons with a tiny footprint&mdash;ready to use with Bootstrap and Foundation. [View the collection](https://github.com/iconic/open-iconic)
 
 
 
@@ -17,7 +17,7 @@
 
 ## Getting Started
 
-#### For code samples and everything else you need to get started with Open Iconic, check out our [Icons](http://useiconic.com/open#icons) and [Reference](http://useiconic.com/open#reference) sections.
+#### For code samples and everything else you need to get started with Open Iconic, check out our [Icons](https://github.com/iconic/open-iconic) and [Reference](https://github.com/iconic/open-iconic) sections.
 
 ### General Usage
 
@@ -74,7 +74,7 @@ You can find our Bootstrap stylesheets in `font/css/open-iconic-bootstrap.{css, 
 
 
 ```
-<span class="oi oi-icon-name" title="icon name" ></span>
+<span class="oi oi-icon-name" title="icon name" aria-hidden="true"></span>
 ```
 
 ##### …with Foundation
@@ -87,7 +87,7 @@ You can find our Foundation stylesheets in `font/css/open-iconic-foundation.{css
 
 
 ```
-<span class="fi-icon-name" title="icon name" ></span>
+<span class="fi-icon-name" title="icon name" aria-hidden="true"></span>
 ```
 
 ##### …on its own
@@ -99,7 +99,7 @@ You can find our default stylesheets in `font/css/open-iconic.{css, less, scss, 
 ```
 
 ```
-<span class="oi" data-glyph="icon-name" title="icon name" ></span>
+<span class="oi" data-glyph="icon-name" title="icon name" aria-hidden="true"></span>
 ```
 
 
