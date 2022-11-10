@@ -1,6 +1,8 @@
 # BlazorLibrary
 A library for video games on the computer, created using .NET Core 7.0 with MAUI and Blazor!
 
+#### Until further notice, the formatting of many things are broken because of the port to MAUI, many things have to be edited.
+
 ## Technologies
 
 ### Created using
