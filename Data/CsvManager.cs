@@ -1,15 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-
-
+﻿
 using CsvHelper;
+
+using System.Globalization;
+
 using CsvHelper.Configuration;
 using BlazorLibrary.Modelle.Csv;
-using Microsoft.SqlServer.Server;
-using System.Reflection.PortableExecutable;
-using System.Text;
 
 namespace BlazorLibrary.Data
 {
@@ -33,7 +28,6 @@ namespace BlazorLibrary.Data
                 {
                     ProcessCsvGenreEntries(RetList, csv);
                 }
-
             }
             return RetList;
         }
@@ -73,7 +67,7 @@ namespace BlazorLibrary.Data
         {
             CsvConfiguration configuration = new(CultureInfo.CurrentCulture)
             {
-                Delimiter= ",",
+                Delimiter = ",",
                 HasHeaderRecord = true,
                 HeaderValidated = null,
                 MissingFieldFound = null,

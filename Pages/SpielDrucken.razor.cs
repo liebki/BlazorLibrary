@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 using BlazorLibrary.Modelle;
 
@@ -14,9 +11,9 @@ namespace BlazorLibrary.Pages
         [Parameter]
         [SupplyParameterFromQuery]
         public string SpielId { get; set; }
+
         public Spiel spiel { get; set; } = null;
         private string ImageBase64Data { get; set; } = string.Empty;
-
 
         protected override async Task OnInitializedAsync()
         {
@@ -33,15 +30,15 @@ namespace BlazorLibrary.Pages
         /// </summary>
         public async Task DruckeSpiel()
         {
-            if(ImageBase64Data?.Length > 0 && ImageBase64Data != string.Empty)
+            if (ImageBase64Data?.Length > 0 && ImageBase64Data != string.Empty)
             {
                 try
                 {
-                    ImageBase64Data = ImageBase64Data.Replace("data:image/png;base64,", "");
+                    ImageBase64Data = ImageBase64Data.Replace("data:image/png;base64,", string.Empty);
                     DirectoryInfo tempDir = Directory.CreateDirectory(Path.Combine($"C:\\Users\\{Environment.UserName}\\AppData\\Local\\Temp", "BlazorGameLibraryImageDump"));
                     Guid randomImageName = Guid.NewGuid();
 
-                    string imagePath = Path.Combine(tempDir.FullName, randomImageName + ".png");
+                    string imagePath = Path.Combine(tempDir.FullName, $"{randomImageName}.png");
                     byte[] imgByteArray = Convert.FromBase64String(ImageBase64Data);
 
                     File.WriteAllBytes(imagePath, imgByteArray);

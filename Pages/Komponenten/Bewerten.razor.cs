@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-
-using Blazored.Modal;
-using Blazored.Modal.Services;
-
+﻿using Blazored.Modal;
 using BlazorLibrary.Modelle;
+
+using Blazored.Modal.Services;
 
 using Microsoft.AspNetCore.Components;
 
@@ -11,8 +9,8 @@ namespace BlazorLibrary.Pages.Komponenten
 {
     partial class Bewerten
     {
-        private string bewertungtooltip { get; set; } = "";
-        private Bewertung sterneBewertung { get; set; } = new(0, "");
+        private string bewertungtooltip { get; set; } = string.Empty;
+        private Bewertung sterneBewertung { get; set; } = new(0, string.Empty);
         [CascadingParameter] private BlazoredModalInstance BlazoredModal { get; set; }
         private int auswahl { get; set; } = 0;
 

@@ -2,7 +2,6 @@
 
 function put2Canvas(canvasDestination) {
     html2canvas(document.querySelector("#spieldruck")).then(canvas => {
-
         var canvasID = document.getElementById(canvasDestination);
         //get the destination context
         var ctx = canvasID.getContext('2d');
@@ -12,7 +11,6 @@ function put2Canvas(canvasDestination) {
         ctx.drawImage(canvas, 0, 0);
     });
 }
-
 
 function getData() {
     return new Promise((resolve, reject) => {
@@ -24,13 +22,11 @@ function getData() {
     });
 }
 
-
 function downloadScreenShot(filename) {
     html2canvas(document.querySelector("#spieldruck")).then(canvas => {
         saveAs(canvas.toDataURL(), filename + '.png')
     });
 }
-
 
 function saveAs(uri, filename) {
     var link = document.createElement('a');

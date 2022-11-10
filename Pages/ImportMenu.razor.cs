@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using Blazored.Modal.Services;
+﻿using Blazored.Modal.Services;
 
 using BlazorLibrary.Management;
 using BlazorLibrary.Modelle.Csv;
@@ -16,9 +12,12 @@ namespace BlazorLibrary.Pages
     {
         [Parameter]
         [SupplyParameterFromQuery]
-        public string Nachricht { get; set; } = "";
+        public string Nachricht { get; set; } = string.Empty;
+
         [CascadingParameter] public IModalService Modal { get; set; }
+
         private void ShowModal() => Modal.Show<Confirm>(Nachricht);
+
         public StreamReader spielcsv { get; set; } = null;
         public string spielcsv_state { get; set; } = "Nothing";
         public StreamReader genrecsv { get; set; } = null;
@@ -71,7 +70,7 @@ namespace BlazorLibrary.Pages
 
         public async Task SelectImportCsv(ImportType sel)
         {
-            if(sel == ImportType.Spiel)
+            if (sel == ImportType.Spiel)
             {
                 StreamReader input = await Manager.ReadStreamFromFile();
                 if (input?.BaseStream.Length > 0)
@@ -80,7 +79,8 @@ namespace BlazorLibrary.Pages
                     spielcsv_state = "File selected, read and waiting for import.";
                     StateHasChanged();
                 }
-            } else
+            }
+            else
             {
                 StreamReader input = await Manager.ReadStreamFromFile();
                 if (input?.BaseStream.Length > 0)
@@ -90,9 +90,7 @@ namespace BlazorLibrary.Pages
                     StateHasChanged();
                 }
             }
-
         }
-
     }
 
     public enum ImportType

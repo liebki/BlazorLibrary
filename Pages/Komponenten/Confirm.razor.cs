@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using Blazored.Modal;
+﻿using Blazored.Modal;
 using Blazored.Modal.Services;
 
 using Microsoft.AspNetCore.Components;

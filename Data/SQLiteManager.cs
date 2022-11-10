@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SQLite;
-using System.Threading.Tasks;
 
-using BlazorLibrary.Management;
 using BlazorLibrary.Modelle;
+using BlazorLibrary.Management;
 using BlazorLibrary.Modelle.Csv;
 
 namespace BlazorLibrary.Data
@@ -51,7 +48,7 @@ namespace BlazorLibrary.Data
         {
             foreach (CsvSpiel spiel in spieleliste)
             {
-                await CreateGameInDatabase(spiel.Name, spiel.Beschreibung, spiel.Bildlink, spiel.Exepfad, "", 0, 0, 0, "", "");
+                await CreateGameInDatabase(spiel.Name, spiel.Beschreibung, spiel.Bildlink, spiel.Exepfad, string.Empty, 0, 0, 0, string.Empty, string.Empty);
             }
         }
 

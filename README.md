@@ -8,23 +8,25 @@ A library for video games on the computer, created using .NET Core 7.0 with MAUI
     - Bootstrap 4.3.1
     - JQuery 3.3.1
     - PopperJs 1.14.7
+    - Various nugets
+    - https://html2canvas.hertzen.com
 
 ### Nuget(s)
-Microsoft.Windows.SDK.BuildTools             10.0.22621.1
-Microsoft.AspNetCore.Components.WebView.Maui 7.0.49      
-Blazored.Modal                               7.1.0       
-Microsoft.Extensions.DependencyInjection     7.0.0       
-HtmlAgilityPack                              1.11.46     
-System.Data.SQLite                           1.0.116     
-Microsoft.Extensions.Logging                 7.0.0       
-CsvHelper                                    30.0.0      
-Microsoft.Extensions.Logging.Abstractions    7.0.0       
-Newtonsoft.Json                              13.0.1      
-Microsoft.WindowsAppSDK                      1.1.5       
-Microsoft.Maui.Graphics.Win2D.WinUI.Desktop  7.0.49      
-Microsoft.Maui.Graphics                      7.0.49      
-Microsoft.Extensions.Logging.Debug           7.0.0       
-Microsoft.Extensions.Configuration           7.0.0    
+- Microsoft.Windows.SDK.BuildTools             10.0.22621.1
+- Microsoft.AspNetCore.Components.WebView.Maui 7.0.49      
+- Blazored.Modal                               7.1.0       
+- Microsoft.Extensions.DependencyInjection     7.0.0       
+- HtmlAgilityPack                              1.11.46     
+- System.Data.SQLite                           1.0.116     
+- Microsoft.Extensions.Logging                 7.0.0       
+- CsvHelper                                    30.0.0      
+- Microsoft.Extensions.Logging.Abstractions    7.0.0       
+- Newtonsoft.Json                              13.0.1      
+- Microsoft.WindowsAppSDK                      1.1.5       
+- Microsoft.Maui.Graphics.Win2D.WinUI.Desktop  7.0.49      
+- Microsoft.Maui.Graphics                      7.0.49      
+- Microsoft.Extensions.Logging.Debug           7.0.0       
+- Microsoft.Extensions.Configuration           7.0.0
 
 ### External Sources (API's)
 - MMOGA 

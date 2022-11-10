@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
+﻿using BlazorLibrary.Modelle;
 using BlazorLibrary.Management;
-using BlazorLibrary.Modelle;
 
 namespace BlazorLibrary.Pages
 {
@@ -15,7 +12,10 @@ namespace BlazorLibrary.Pages
 
         public int Filterung
         {
-            get { return filterung; }
+            get
+            {
+                return filterung;
+            }
             set
             {
                 filterung = value;
@@ -25,7 +25,10 @@ namespace BlazorLibrary.Pages
 
         public int Filterungfolge
         {
-            get { return filterungfolge; }
+            get
+            {
+                return filterungfolge;
+            }
             set
             {
                 filterungfolge = value;

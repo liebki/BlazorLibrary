@@ -1,7 +1,5 @@
-﻿using System.Threading.Tasks;
-
+﻿using BlazorLibrary.Modelle;
 using BlazorLibrary.Management;
-using BlazorLibrary.Modelle;
 
 namespace BlazorLibrary.Pages
 {
@@ -10,9 +8,9 @@ namespace BlazorLibrary.Pages
         public int[] AuswahlGenre { get; set; } = { };
         public Genre[] GenreListe { get; set; }
         private string Name { get; set; }
-        private string Beschreibung { get; set; } = "";
+        private string Beschreibung { get; set; } = string.Empty;
         private string Bildlink { get; set; }
-        private string Exepfad { get; set; } = "";
+        private string Exepfad { get; set; } = string.Empty;
 
         public async Task SelectExeFile()
         {
@@ -22,12 +20,6 @@ namespace BlazorLibrary.Pages
                 Exepfad = file.FullPath;
                 StateHasChanged();
             }
-            //string dateiPfad = await fileMan.DateiDialogOeffnen();
-            //if (!string.IsNullOrEmpty(dateiPfad))
-            //{
-            //    Exepfad = dateiPfad;
-            //    StateHasChanged();
-            //}
         }
 
         protected override async Task OnInitializedAsync()
@@ -47,7 +39,7 @@ namespace BlazorLibrary.Pages
                     await _db.SaveGenreOfGame(SpielId, AuswahlGenre);
                 }
 
-                navMan.NavigateTo("/?Nachricht=You created the game " + Name, true);
+                navMan.NavigateTo($"/?Nachricht=You created the game {Name}", true);
             }
             else
             {

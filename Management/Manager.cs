@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
+﻿using System.Text;
+using Newtonsoft.Json;
 using System.Reflection;
-using System.Text;
+using System.Diagnostics;
 
 using BlazorLibrary.Data;
 using BlazorLibrary.Modelle;
+using System.Net.NetworkInformation;
+
 using BlazorLibrary.Modelle.Application;
-using BlazorLibrary.Modelle.Csv;
-
-using Microsoft.AspNetCore.Components;
-
-using Newtonsoft.Json;
 
 namespace BlazorLibrary.Management
 {
@@ -230,7 +223,6 @@ namespace BlazorLibrary.Management
 
                     stream.Flush();
                     stream.Position = 0;
-
                 }
                 return ret.ToString();
             }

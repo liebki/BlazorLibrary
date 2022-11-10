@@ -1,29 +1,26 @@
-﻿using System.Reflection;
-
-using Blazored.Modal;
+﻿using Blazored.Modal;
 
 using BlazorLibrary.Data;
 using BlazorLibrary.Management;
-using BlazorLibrary.Modelle.Application;
-
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Infrastructure;
 using Microsoft.Extensions.Logging;
 
-namespace BlazorLibrary {
+using BlazorLibrary.Modelle.Application;
 
+namespace BlazorLibrary
+{
     public static class MauiProgram
     {
         public static ApplicationSettings Einstellungen { get; set; } = new();
+
         public static MauiApp CreateMauiApp()
-	    {
+        {
             var builder = MauiApp.CreateBuilder();
-		    builder
-			    .UseMauiApp<App>()
-			    .ConfigureFonts(fonts =>
-			    {
-				    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-			    });
+            builder
+                .UseMauiApp<App>()
+                .ConfigureFonts(fonts =>
+                {
+                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                });
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
@@ -33,12 +30,12 @@ namespace BlazorLibrary {
 
             builder.Services.AddSingleton<SQLiteManager>();
             builder.Services.AddSingleton<RawgAccessManager>();
-            
+
             builder.Services.AddSingleton<CsvManager>();
             SetupLibrary();
 
             return builder.Build();
-	    }
+        }
 
         private static void SetupLibrary()
         {
@@ -47,7 +44,7 @@ namespace BlazorLibrary {
 
             if (Einstellungen is not null)
             {
-                if (!InternetAvailable)
+                if (!InternetAvailable || Einstellungen.Rawgapikey.Length < 10)
                 {
                     Einstellungen.Usepricescraper = false;
                     Einstellungen.Userawg = false;

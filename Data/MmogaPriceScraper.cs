@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 
 namespace BlazorLibrary.Data
 {

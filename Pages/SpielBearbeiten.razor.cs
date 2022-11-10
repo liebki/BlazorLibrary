@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using BlazorLibrary.Modelle;
+﻿using BlazorLibrary.Modelle;
+using BlazorLibrary.Management;
 
 using Microsoft.AspNetCore.Components;
 
@@ -12,16 +10,17 @@ namespace BlazorLibrary.Pages
         [Parameter]
         [SupplyParameterFromQuery]
         public string SpielId { get; set; }
+
         public int[] AuswahlGenre { get; set; } = { };
         public Genre[] GenreListe { get; set; }
         public Spiel Spiel { get; set; }
 
         public async Task SelectExeFile()
         {
-            string dateiPfad = await fileMan.DateiDialogOeffnen();
-            if (!string.IsNullOrEmpty(dateiPfad))
+            FileResult file = await Manager.GetExecuteablePath();
+            if (file != null)
             {
-                Spiel.Exepfad = dateiPfad;
+                Spiel.Exepfad = file.FullPath;
                 StateHasChanged();
             }
         }
@@ -37,7 +36,7 @@ namespace BlazorLibrary.Pages
             await _db.RemoveAllGenreOfGame(Spiel.Id);
 
             await _db.SaveGenreOfGame(Spiel.Id, AuswahlGenre);
-            navMan.NavigateTo("/?Nachricht=You edited the game " + Spiel.Name, true);
+            navMan.NavigateTo($"/?Nachricht=You edited the game {Spiel.Name}", true);
         }
 
         private async Task HoleDaten()

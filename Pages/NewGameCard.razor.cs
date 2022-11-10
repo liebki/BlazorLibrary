@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-
-using Blazored.Modal;
-using Blazored.Modal.Services;
-
+﻿using Blazored.Modal;
 using BlazorLibrary.Modelle;
+
+using Blazored.Modal.Services;
 using BlazorLibrary.Pages.Komponenten;
 
 using Microsoft.AspNetCore.Components;
@@ -14,8 +12,10 @@ namespace BlazorLibrary.Pages
     {
         [Parameter]
         public Spiel spiel { get; set; }
+
         [CascadingParameter] public IModalService Modal { get; set; }
         private Bewertung Bewertung;
+
         private async Task SpielLoeschen()
         {
             await _db.SetSpielDeleteStatus(spiel, true);

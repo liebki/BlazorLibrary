@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using BlazorLibrary.Pages.Komponenten;
+﻿
+using BlazorLibrary.Modelle;
 
 using Blazored.Modal.Services;
+using BlazorLibrary.Pages.Komponenten;
 
 using Microsoft.AspNetCore.Components;
-using BlazorLibrary.Modelle;
 
 namespace BlazorLibrary.Pages
 {
@@ -15,9 +12,12 @@ namespace BlazorLibrary.Pages
     {
         [Parameter]
         [SupplyParameterFromQuery]
-        public string Nachricht { get; set; } = "";
+        public string Nachricht { get; set; } = string.Empty;
+
         [CascadingParameter] public IModalService Modal { get; set; }
+
         private void ShowModal() => Modal.Show<Confirm>(Nachricht);
+
         public string NeuesGenre { get; set; }
         public int[] auswahlgenre { get; set; } = { };
         public Genre editgenre { get; set; }
@@ -34,7 +34,10 @@ namespace BlazorLibrary.Pages
 
         public int[] AuswahlGenre
         {
-            get { return auswahlgenre; }
+            get
+            {
+                return auswahlgenre;
+            }
             set
             {
                 auswahlgenre = value;
@@ -48,7 +51,7 @@ namespace BlazorLibrary.Pages
         public async Task AendereGenre()
         {
             await _db.RenameGenre(editgenre);
-            navMan.NavigateTo("/genreverwalten?Nachricht=You renamed a genre to " + editgenre.Name, true);
+            navMan.NavigateTo($"/genreverwalten?Nachricht=You renamed a genre to {editgenre.Name}", true);
 
             await HoleDaten();
         }
@@ -58,9 +61,9 @@ namespace BlazorLibrary.Pages
             if (!(NeuesGenre.Length > 0 && string.IsNullOrWhiteSpace(NeuesGenre)))
             {
                 await _db.CreateGenreInDatabase(NeuesGenre);
-                navMan.NavigateTo("/genreverwalten?Nachricht=You created the genre " + NeuesGenre, true);
+                navMan.NavigateTo($"/genreverwalten?Nachricht=You created the genre {NeuesGenre}", true);
 
-                NeuesGenre = "";
+                NeuesGenre = string.Empty;
                 await HoleDaten();
             }
         }
@@ -80,7 +83,7 @@ namespace BlazorLibrary.Pages
                     }
 
                     Genre[] liste = await _db.AlleGenreErhalten();
-                    string GenreNamen = "";
+                    string GenreNamen = string.Empty;
 
                     foreach (int i in AuswahlGenre)
                     {
@@ -88,12 +91,12 @@ namespace BlazorLibrary.Pages
                         {
                             if (genre.Id.Equals(i))
                             {
-                                GenreNamen += genre.Name + " ";
+                                GenreNamen += $"{genre.Name} ";
                             }
                         }
                     }
                     await _db.DeleteGenreInDatabase(AuswahlGenre);
-                    navMan.NavigateTo("/genreverwalten?Nachricht=" + msg + GenreNamen, true);
+                    navMan.NavigateTo($"/genreverwalten?Nachricht={msg}{GenreNamen}", true);
 
                     await HoleDaten();
                 }
