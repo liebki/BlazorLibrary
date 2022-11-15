@@ -1,12 +1,12 @@
 ﻿namespace BlazorLibrary.Modelle.Csv
 {
-    public class CsvGenre
-    {
-        public CsvGenre(string name)
-        {
-            this.Name = name;
-        }
+	public class CsvGenre
+	{
+		public CsvGenre(string name)
+		{
+			this.Name = name;
+		}
 
-        public string Name { get; set; }
-    }
+		public string Name { get; set; }
+	}
 }
