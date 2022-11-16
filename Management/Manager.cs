@@ -8,13 +8,30 @@ using BlazorLibrary.Modelle;
 using System.Net.NetworkInformation;
 
 using BlazorLibrary.Modelle.Application;
+using BlazorLibrary.Modelle.Nutzer;
 
 namespace BlazorLibrary.Management
 {
 	public static class Manager
 	{
+		public static LibraryUser ActiveUser { get; set; } = null;
 		private static readonly string[] BildFilterBegriffe = { ".png", ".jpg", ".gif" };
 
+
+        public static bool DoesStringContainCharacters(string s)
+        {
+            foreach (char c in s)
+            {
+                if (!char.IsDigit(c))
+                    return true;
+            }
+            return false;
+        }
+
+        public static void ClearActiveUser()
+		{
+			ActiveUser = null;
+		}
 		public static bool InternetAvailable()
 		{
 			try
@@ -33,7 +50,7 @@ namespace BlazorLibrary.Management
 
 		public static void SaveImage(Stream stream, string path)
 		{
-			using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
+			using (FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
 			{
 				stream.CopyTo(fileStream);
 			}

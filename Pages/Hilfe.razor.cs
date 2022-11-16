@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages
 {
-	partial class Index
+	partial class Hilfe
 	{
 		[Parameter]
 		[SupplyParameterFromQuery]

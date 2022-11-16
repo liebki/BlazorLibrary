@@ -1,0 +1,39 @@
+@page "/"
+
+@if(Manager.ActiveUser is not null)
+{
+    <h3>Hi @Manager.ActiveUser.Name, you can logout using the button below</h3>
+    <br />
+
+    <button @onclick="TryUserLogout" class="btn btn-warning">Logout</button>
+} else
+{
+    <h3>Hi, please login using your credentials</h3>
+    <br />
+
+    <form>
+        <div class="form-group">
+            <label for="nicknameField">Nickname</label>
+            <input type="text" class="form-control" @bind="Nickname" placeholder="Enter your nickname">
+        </div>
+        <br/>
+
+        <div class="form-group">
+            <label for="passwordField">Passcode</label>
+            <input type="password" class="form-control" @bind="Passcode" placeholder="Pincode">
+        </div>
+        <br />
+
+        <button @onclick="TryUserLogin" class="btn btn-primary">Login</button>
+    </form>
+    <br />
+
+    <details>
+        <summary><b>How do I register an account?</b></summary>
+
+        <p>
+            Just type in a name and a six digit long pincode, 
+            <mark>if the combination doesnt<br/>exist, we ask you if you want to create an account using those credentials.</mark>
+        </p>
+    </details>
+}

@@ -1,0 +1,5 @@
+﻿@inject NavigationManager NavMan
+
+@if (Manager.ActiveUser is null) {
+	NavMan.NavigateTo("/", true);
+}

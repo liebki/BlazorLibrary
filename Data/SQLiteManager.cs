@@ -4,6 +4,8 @@ using System.Data.SQLite;
 using BlazorLibrary.Modelle;
 using BlazorLibrary.Management;
 using BlazorLibrary.Modelle.Csv;
+using BlazorLibrary.Modelle.Nutzer;
+using Windows.System;
 
 namespace BlazorLibrary.Data
 {
@@ -16,6 +18,11 @@ namespace BlazorLibrary.Data
 			ExecuteQuery("CREATE TABLE IF NOT EXISTS spiele (id INT, name TEXT, beschreibung TEXT, bildlink TEXT, exepfad TEXT, sternetooltip TEXT,favorit INT, sterne INT, papierkorb INT, metacritic TEXT, estimatedprice TEXT, PRIMARY KEY(id))");
 			ExecuteQuery("CREATE TABLE IF NOT EXISTS genre (id INT, name TEXT, PRIMARY KEY(id))");
 			ExecuteQuery("CREATE TABLE IF NOT EXISTS spielgenre (spielid INT, genreid INT, PRIMARY KEY (spielid, genreid))");
+			ExecuteQuery("CREATE TABLE IF NOT EXISTS nutzer (id INT, name TEXT, pincode INT, PRIMARY KEY (id))");
+
+			//Kommentare und Ids
+			ExecuteQuery("CREATE TABLE IF NOT EXISTS kommentare (id INT, kommentartext TEXT, PRIMARY KEY (id))");
+			//Spieletable anpassen wegen Ids
 		}
 
 		private static SQLiteConnection HoleConnnection()
@@ -159,7 +166,78 @@ namespace BlazorLibrary.Data
 			}
 		}
 
-		public async Task<bool> SpielGenreCheck(int[] genreids)
+        public async Task ErstelleNutzer(string nickname, int passcode)
+        {
+            using (SQLiteConnection con = HoleConnnection())
+            {
+                con.Open();
+                using (SQLiteCommand comm = con.CreateCommand())
+                {
+					int RandomId = new Random().Next(99,99999);
+                    comm.CommandText = "INSERT INTO nutzer (id, name,pincode) VALUES (@id, @name,@pincode)";
+
+                    comm.CommandType = CommandType.Text;
+                    comm.Parameters.Add(new("@id", RandomId));
+
+                    comm.Parameters.Add(new("@name", nickname));
+					comm.Parameters.Add(new("@pincode", passcode));
+
+                    await comm.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+        public Tuple<LibraryUser, UserCase> ErhalteNutzer(string nickname, int passcode)
+        {
+			Tuple<LibraryUser, UserCase> User = null;
+            using (SQLiteConnection con = HoleConnnection())
+            {
+                con.Open();
+                using (SQLiteCommand comm = con.CreateCommand())
+                {
+                    comm.CommandText = "SELECT id FROM nutzer WHERE name=@name AND pincode=@pincode;";
+                    comm.CommandType = CommandType.Text;
+
+                    comm.Parameters.Add(new("@name", nickname));
+                    comm.Parameters.Add(new("@pincode", passcode));
+
+                    SQLiteDataReader r = comm.ExecuteReader();
+					int ResultCounter = 0;
+
+					int UserId = 0;
+					while (r.Read())
+                    {
+						ResultCounter++;
+                        UserId = r.GetInt32(0);
+					}
+
+					LibraryUser user = null;
+					UserCase usercase;
+
+					if (ResultCounter == 0)
+                    {
+                        //Erstellbar
+                        user = new(UserId, nickname, passcode);
+						usercase = UserCase.Createable;
+                    } else if (ResultCounter == 1)
+                    {
+                        //Login
+                        user = new(UserId, nickname, passcode);
+                        usercase = UserCase.Exists;
+                    } else
+					{
+                        //Fehler
+                        user = new(UserId, nickname, passcode);
+                        usercase = UserCase.Error;
+                    }
+
+					User = new Tuple<LibraryUser, UserCase>(user, usercase);
+                }
+            }
+			return User;
+        }
+
+        public async Task<bool> SpielGenreCheck(int[] genreids)
 		{
 			bool spielNutztGenre = false;
 			List<Spiel> AktuelleSpieleListe = await SpieleListeErhalten();
