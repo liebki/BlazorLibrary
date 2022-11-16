@@ -2,9 +2,9 @@
 
 namespace BlazorLibrary.Pages
 {
-	partial class SterneDarstellung
-	{
-		[Parameter]
-		public int Sterne { get; set; }
-	}
+    partial class SterneDarstellung
+    {
+        [Parameter]
+        public int Sterne { get; set; }
+    }
 }
