@@ -1,49 +1,41 @@
 @inject SQLiteManager _db
 @inject NavigationManager navMan
 
-@page "/spielhinzufuegen"
+@page "/addgame"
 
 <LoginCheck />
 
-<h1>Add game</h1>
+<MudText Typo="Typo.h4">Add a game to your library</MudText>
 
-<div class="form-group">
-  <label for="namefeld">Name of the game</label>
-  <input @bind="Name" type="text" class="form-control" id="namefeld" placeholder="Name">
+<div class="mt-1">
+    <MudTextField Label="Name of the game" T="string" @bind-Value="Name" InputType="InputType.Text" />
 </div>
 
-<div class="form-group">
-  <label for="beschreibungfeld">Description of the game</label>
-  <input @bind="Beschreibung" type="text" class="form-control" id="beschreibungfeld" placeholder="Description">
+<div class="mt-1">
+    <MudTextField Label="Description of the game" T="string" @bind-Value="Beschreibung" InputType="InputType.Text" />
 </div>
 
-<div class="form-group">
-  <label for="bildfeld">Url to image</label>
-  <input @bind="Bildlink" type="text" class="form-control" id="bildfeld" placeholder="Url to image">
+<div class="mt-1">
+    <MudTextField Label="Url to image" T="string" @bind-Value="Bildlink" InputType="InputType.Text" />
 </div>
 
-<div class="form-group">
-  <label for="pfadfeld">Path to exe file</label>
-  <input @bind="Exepfad" type="text" class="form-control" id="pfadfeld" placeholder="Path to exe file">
-  <br />
-  <button @onclick="SelectExeFile" class="btn btn-primary">Choose file</button>
+<div class="mt-1">
+    <MudTextField Label="Path to exe file" T="string" @bind-Value="Exepfad" InputType="InputType.Text" />
+    <MudButton Class="mt-2" OnClick="SelectExeFile" Variant="Variant.Filled" Color="Color.Info" >Choose .exe file</MudButton>
 </div>
 
-@if(GenreListe.Length > 0)
-{
-    <div class="form-group">
-    <label for="genrefeld">Kategorien</label>
-    <select multiple @bind="AuswahlGenre" class="form-control" id="genrefeld">
-        @foreach (Genre gr in GenreListe)
-        {
-            <option value="@gr.Id">@gr.Name</option>
-        }
-    </select>
-    </div>
-} else
-{
-    <p>There are no genre, add some genre to use them here...</p>
-}
-
-<button @onclick="speichereDaten" class="btn btn-success">Save</button>
-<button href="/anzeige" class="btn btn-danger">Quit</button>
+<div class="mt-2">
+    @if(GenreListe.Length > 0)
+    {
+        <MudSelect Placeholder="Choose genre for the new game" ToStringFunc="GenreIdToGenreName" Label="Choose genre for the new game" Class="" MultiSelection="true" T="Genre" @bind-SelectedValues="GenreAuswahl">
+            @foreach (Genre gr in GenreListe)
+            {
+                <MudSelectItem Value="@gr">@gr.Name</MudSelectItem>
+            }
+        </MudSelect>
+    } else
+    {
+        <MudText Color="Color.Error" Class="pb-2">Error: There are no genre, add some genre to use them here...</MudText>
+    }
+    <MudButton Class="mt-3" OnClick="speichereDaten" Variant="Variant.Filled" Color="Color.Success">Save game</MudButton>
+</div>

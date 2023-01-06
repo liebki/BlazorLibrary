@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace BlazorLibrary.Modelle.Nutzer
+﻿namespace BlazorLibrary.Modelle.Nutzer
 {
     public class LibraryUser
     {
@@ -15,6 +12,5 @@ namespace BlazorLibrary.Modelle.Nutzer
         public int Id { get; set; }
         public string Name { get; set; }
         public int Passcode { get; set; }
-
     }
 }

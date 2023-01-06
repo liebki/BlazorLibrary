@@ -26,7 +26,7 @@ namespace BlazorLibrary.Data
                 {
                     WebContentResult = GetUrlResponseString(response);
                 }
-                if (!object.Equals(WebContentResult, null) && SearchResultChecker(WebContentResult))
+                if (!string.IsNullOrEmpty(WebContentResult) && SearchResultChecker(WebContentResult))
                 {
                     HtmlDocument doc = new();
                     doc.LoadHtml(WebContentResult);

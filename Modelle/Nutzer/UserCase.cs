@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace BlazorLibrary.Modelle.Nutzer
+﻿namespace BlazorLibrary.Modelle.Nutzer
 {
     public enum UserCase
     {

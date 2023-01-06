@@ -14,7 +14,6 @@
         <label for="spielname">Name of the game</label>
         <p id="spielname">@spiel.Name</p>
     </div>
-    <br />
 
     <div class="form-floating">
         <label for="spielbeschreibung">Description of the game</label>
@@ -27,11 +26,10 @@
             <p id="spielname" class="errorTextEl">There is no description.</p>
         }
     </div>
-    <br />
 
     <div class="form-floating">
         <label for="spielbild">Picture of the game</label>
-        <br />
+
         @if (spiel.Bildlink.StartsWith("http"))
         {
             <img id="spielbild" src="@spiel.Bildlink" class="img-rounded druckBildGroesse">
@@ -41,7 +39,6 @@
             <p id="spielname" class="errorTextEl">There is no image.</p>
         }
     </div>
-    <br />
 
     <div class="form-floating">
         <label for="spielsterne">Own rating (stars)</label>
@@ -59,7 +56,6 @@
 
     @if (MauiProgram.Einstellungen.Usepricescraper)
     {
-        <br />
         <div class="form-floating">
             <label for="spielpreis">Estimated price of the game (or addons)</label>
             @if (!string.IsNullOrWhiteSpace(spiel.Estimatedprice) && !spiel.Estimatedprice.Equals("!"))
@@ -75,7 +71,6 @@
 
     @if (MauiProgram.Einstellungen.Userawg)
     {
-        <br />
         <div class="form-floating">
             <label for="spielmetacritics">Last metacritics value</label>
             @if (!string.IsNullOrWhiteSpace(spiel.Metacritics) && !spiel.Metacritics.Equals("!"))
@@ -88,7 +83,6 @@
             }
         </div>
     }
-    <br />
 
     <div class="form-floating">
         <label for="spielgenre">Genre of the game</label>
@@ -101,7 +95,6 @@
             <p id="spielname" class="errorTextEl">There are no genre.</p>
         }
     </div>
-    <br />
 
 </div>
 

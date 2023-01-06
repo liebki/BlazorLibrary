@@ -1,10 +1,10 @@
-﻿
+﻿using System.Globalization;
+
+using BlazorLibrary.Modelle.Csv;
+
 using CsvHelper;
 
-using System.Globalization;
-
 using CsvHelper.Configuration;
-using BlazorLibrary.Modelle.Csv;
 
 namespace BlazorLibrary.Data
 {
@@ -37,7 +37,7 @@ namespace BlazorLibrary.Data
             while (csv.Read())
             {
                 string Name = csv.GetField("Name");
-                if (!object.Equals(Name, null) && !string.IsNullOrWhiteSpace(Name))
+                if (!string.IsNullOrEmpty(Name) && !string.IsNullOrWhiteSpace(Name))
                 {
                     CsvGenre genre = new(Name);
                     RetList.Add(genre);
@@ -50,7 +50,7 @@ namespace BlazorLibrary.Data
             while (csv.Read())
             {
                 string Name = csv.GetField("Name");
-                if (!object.Equals(Name, null) && !string.IsNullOrWhiteSpace(Name))
+                if (!string.IsNullOrEmpty(Name) && !string.IsNullOrWhiteSpace(Name))
                 {
                     string Beschreibung = csv.GetField("Beschreibung");
                     string Bildlink = csv.GetField("Bildlink");

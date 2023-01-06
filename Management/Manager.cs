@@ -1,14 +1,17 @@
-﻿using System.Text;
-using Newtonsoft.Json;
+﻿using System.Diagnostics;
+
+using System.Net.NetworkInformation;
 using System.Reflection;
-using System.Diagnostics;
+using System.Text;
 
 using BlazorLibrary.Data;
 using BlazorLibrary.Modelle;
+using BlazorLibrary.Modelle.Application;
 using BlazorLibrary.Modelle.Nutzer;
 
-using System.Net.NetworkInformation;
-using BlazorLibrary.Modelle.Application;
+using Newtonsoft.Json;
+
+using RawgNET.Models;
 
 namespace BlazorLibrary.Management
 {
@@ -16,7 +19,6 @@ namespace BlazorLibrary.Management
     {
         public static LibraryUser ActiveUser { get; set; } = null;
         private static readonly string[] BildFilterBegriffe = { ".png", ".jpg", ".gif" };
-
 
         public static bool DoesStringContainCharacters(string s)
         {
@@ -32,15 +34,19 @@ namespace BlazorLibrary.Management
         {
             ActiveUser = null;
         }
+
         public static bool InternetAvailable()
         {
             try
             {
-                using (Ping ping = new())
+                using Ping ping = new();
+                PingReply result = ping.Send("8.8.8.8", 500, new byte[32], new PingOptions
                 {
-                    PingReply result = ping.Send("8.8.8.8", 500, new byte[32], new PingOptions { DontFragment = true, Ttl = 32 });
-                    return result.Status == IPStatus.Success;
-                }
+                    DontFragment = true,
+                    Ttl = 32
+                });
+
+                return result.Status == IPStatus.Success;
             }
             catch
             {
@@ -50,70 +56,71 @@ namespace BlazorLibrary.Management
 
         public static void SaveImage(Stream stream, string path)
         {
-            using (FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
-            {
-                stream.CopyTo(fileStream);
-            }
+            using FileStream fileStream = new(path, FileMode.Create, FileAccess.Write);
+            stream.CopyTo(fileStream);
         }
 
         public static string MauiProgramActiveDirectory()
         {
             string strExeFilePath = Assembly.GetExecutingAssembly().Location;
             string strWorkPath = Path.GetDirectoryName(strExeFilePath);
+
             return strWorkPath;
         }
 
-        public static void AddExternalSource(string name, ref string bild, ref string metacritic, ref string estimatedprice)
+        public static async Task<(string, string, string)> AddExternalSource(string name, string bildurl = "")
         {
-            RawgAccessManager rawgMan = new();
+            string bild = bildurl, metacritic = "∅", estimatedprice = "∅";
+
             if (MauiProgram.Einstellungen.Usepricescraper)
             {
                 string price = MmogaPriceScraper.GetPreisVonSpiel(name);
-                if (object.Equals(price, null))
-                {
-                    estimatedprice = "!";
-                }
-                else
+                if (!string.IsNullOrEmpty(price) && !string.IsNullOrWhiteSpace(price))
                 {
                     estimatedprice = price;
                 }
             }
+
             if (MauiProgram.Einstellungen.Userawg)
             {
-                Game RawgGame = rawgMan.RawgGameInformations(name);
-                if (object.Equals(RawgGame, null))
+                Game RawgGame = await RawgNetManager.GetGameByName(name, MauiProgram.Einstellungen.Rawgapikey, true, true);
+                if (RawgGame != null && RawgGame.Id != null)
                 {
-                    metacritic = "!";
+                    metacritic = Convert.ToString(RawgGame.Metacritic);
+                    if (string.IsNullOrEmpty(bild) || string.IsNullOrWhiteSpace(bild) || !BildFilterBegriffe.Any(bild.Contains))
+                    {
+                        bild = RawgGame.BackgroundImage.ToString();
+                    }
                 }
                 else
                 {
-                    metacritic = Convert.ToString(RawgGame.Metacritic);
-
-                    if (string.IsNullOrEmpty(bild) || !BildFilterBegriffe.Any(bild.Contains))
+                    if (string.IsNullOrEmpty(bild) || string.IsNullOrWhiteSpace(bild) || !BildFilterBegriffe.Any(bild.Contains))
                     {
-                        bild = RawgGame.BackgroundImage.ToString();
+                        bild = "https://sinatax.de/wp-content/themes/consultix/images/no-image-found-360x260.png";
                     }
                 }
             }
             else
             {
-                if (string.IsNullOrEmpty(bild) || !BildFilterBegriffe.Any(bild.Contains))
+                if (string.IsNullOrEmpty(bild) || string.IsNullOrWhiteSpace(bild) || !BildFilterBegriffe.Any(bild.Contains))
                 {
                     bild = "https://sinatax.de/wp-content/themes/consultix/images/no-image-found-360x260.png";
                 }
             }
+            return (bild, metacritic, estimatedprice);
         }
 
-        public static void RemoveNullValues(ref string beschreibung, ref string exepfad)
+        public static (string, string) RemoveNullValues(string beschreibung, string exepfad)
         {
-            if (object.Equals(beschreibung, null))
+            if (string.IsNullOrEmpty(beschreibung))
             {
                 beschreibung = string.Empty;
             }
-            if (object.Equals(exepfad, null))
+            if (string.IsNullOrEmpty(exepfad))
             {
                 exepfad = string.Empty;
             }
+            return (beschreibung, exepfad);
         }
 
         public static int RandomGenreNummer()
@@ -138,6 +145,7 @@ namespace BlazorLibrary.Management
 
         public static void KartenFilterungAnzeige(ref int modus, ref int filterungsfolge, ref List<Spiel> SpieleListe, ref List<Spiel> OriginaleListe)
         {
+            //Broken?
             if (modus == 0)
             {
                 SpieleListe = OriginaleListe;
@@ -202,7 +210,7 @@ namespace BlazorLibrary.Management
         public static string[] GenreArrayToStringArray(Genre[] genrelist)
         {
             string[] result = Array.Empty<string>();
-            if (!object.Equals(genrelist, null) && genrelist.Length >= 1)
+            if (genrelist != null && genrelist.Length >= 1)
             {
                 result = genrelist.Select(a => a.Name).ToArray();
             }

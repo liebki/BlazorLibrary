@@ -1,0 +1,28 @@
+﻿@inject SQLiteManager _db
+@inject NavigationManager navMan
+
+
+<MudCard Elevation=3 id="@Manager.CreateModalId(SpielKarte.Name)" Class="mt-3 mx-2" Style="min-width: 18rem; max-width:22%">
+    <MudCardHeader>
+
+        <CardHeaderContent>
+            <MudText Typo="Typo.button">@SpielKarte.Name</MudText>
+        </CardHeaderContent>
+
+    </MudCardHeader>
+
+    <MudImage Class="rounded-1" Elevation=1 Fluid="true" Src="@SpielKarte.Bildlink" />
+
+    <MudCardActions Class="justify-content-center">
+
+        <MudTooltip Text="Restore to library">
+            <MudIconButton OnClick="SpielWiederherstellen" Icon="@Icons.Material.Filled.Restore" Color="Color.Dark" />
+        </MudTooltip>
+
+        <MudTooltip Text="Delete forever">
+            <MudIconButton OnClick="SpielEndgueltigLoeschen" Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Dark" />
+        </MudTooltip>
+
+    </MudCardActions>
+
+</MudCard>

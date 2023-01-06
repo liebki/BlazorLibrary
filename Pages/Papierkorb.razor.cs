@@ -1,4 +1,5 @@
-﻿using BlazorLibrary.Modelle;
+﻿using BlazorLibrary.Management;
+using BlazorLibrary.Modelle;
 
 namespace BlazorLibrary.Pages
 {
@@ -13,10 +14,18 @@ namespace BlazorLibrary.Pages
 
         public async Task HoleSpiele()
         {
-            SpieleListe.Clear();
-            SpieleListe = await _db.GeloeschteSpieleListeErhalten();
+            if (SpieleListe.Count > 0)
+            {
+                SpieleListe.Clear();
+                StateHasChanged();
+            }
 
-            StateHasChanged();
+            SpieleListe = await _db.GeloeschteSpieleListeErhalten(Manager.ActiveUser);
+
+            if (SpieleListe.Count > 0)
+            {
+                StateHasChanged();
+            }
         }
     }
 }

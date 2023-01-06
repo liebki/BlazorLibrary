@@ -1,5 +1,5 @@
-﻿using BlazorLibrary.Modelle;
-using BlazorLibrary.Management;
+﻿using BlazorLibrary.Management;
+using BlazorLibrary.Modelle;
 
 using Microsoft.AspNetCore.Components;
 
@@ -8,11 +8,11 @@ namespace BlazorLibrary.Pages
     partial class SpielBearbeiten
     {
         [Parameter]
-        [SupplyParameterFromQuery]
         public string SpielId { get; set; }
 
-        public int[] AuswahlGenre { get; set; } = { };
-        public Genre[] GenreListe { get; set; }
+        public IEnumerable<int> G { get; set; } = new HashSet<int>();
+        public IEnumerable<Genre> AuswahlGenre { get; set; } = new HashSet<Genre>();
+        public Genre[] GenreListe { get; set; } = Array.Empty<Genre>();
         public Spiel Spiel { get; set; }
 
         public async Task SelectExeFile()
@@ -24,6 +24,8 @@ namespace BlazorLibrary.Pages
                 StateHasChanged();
             }
         }
+
+        private Func<Genre, string> GenreIdToGenreName = g => g?.Name;
 
         protected override async Task OnInitializedAsync()
         {
@@ -41,16 +43,20 @@ namespace BlazorLibrary.Pages
 
         private async Task HoleDaten()
         {
-            Spiel spiel = await _db.SpielErhalten(Int32.Parse(SpielId));
-            Genre[] genreList = await _db.AlleGenreErhalten();
+            Spiel spiel = await _db.SpielErhalten(int.Parse(SpielId));
+            Genre[] genreList = await _db.AlleGenreErhalten(Manager.ActiveUser);
 
-            if (!object.Equals(null, spiel) && !object.Equals(null, genreList))
+            if (spiel != null)
             {
                 Spiel = spiel;
-                GenreListe = genreList;
-
-                StateHasChanged();
             }
+
+            if (genreList.Length > 0)
+            {
+                GenreListe = genreList;
+            }
+
+            StateHasChanged();
         }
     }
 }

@@ -1,50 +1,49 @@
 ﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand mx-auto" href="">BlazorLibrary</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+    <MudText Typo="Typo.h6" class="navbar-brand mx-auto">BlazorLibrary</MudText>
+    <MudButton class="navbar-toggler" OnClick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
-    </button>
+    </MudButton>
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Start
-            </NavLink>
-        </li>
+    <MudList Style="color:white;">
+
+        @if (Manager.ActiveUser != null) {
+            <MudListItem Disabled Class="px-3">
+                <MudNavLink Disabled IconColor="Color.Primary" Icon="@Icons.Material.Filled.SettingsApplications" Match="NavLinkMatch.All">Settings</MudNavLink>
+            </MudListItem>
+        }
+
+        <MudListItem Class="px-3">
+            <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.Home" Href="" Match="NavLinkMatch.All">Start</MudNavLink>
+        </MudListItem>
+
         @if(Manager.ActiveUser != null)
         {
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="mmoganetdemo">
-                    <span class="oi oi-folder" aria-hidden="true"></span> MmogaNetDemo
-                </NavLink>
-            </li>
+            <MudListItem Class="px-3">
+                <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.Folder" Href="games" Match="NavLinkMatch.All">Library</MudNavLink>
+            </MudListItem>
 
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="anzeige">
-                    <span class="oi oi-folder" aria-hidden="true"></span> Library
-                </NavLink>
-            </li>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="spielhinzufuegen">
-                    <span class="oi oi-plus" aria-hidden="true"></span> Add game
-                </NavLink>
-            </li>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="genreverwalten">
-                    <span class="oi oi-book" aria-hidden="true"></span> Manage genre
-                </NavLink>
-            </li>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="import">
-                    <span class="oi oi-file" aria-hidden="true"></span> Import
-                </NavLink>
-            </li>
-            <li class="nav-item px-3">
-                <NavLink class="nav-link" href="papierkorb">
-                    <span class="oi oi-trash" aria-hidden="true"></span> Trashcan
-                </NavLink>
-            </li>
+            <MudListItem Class="px-3">
+                <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.ExposurePlus1" Href="addgame" Match="NavLinkMatch.All">Add a game</MudNavLink>
+            </MudListItem>
+
+            <MudListItem Class="px-3">
+                <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.Book" Href="genres" Match="NavLinkMatch.All">Genres</MudNavLink>
+            </MudListItem>
+
+            <MudListItem Class="px-3">
+                <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.FileUpload" Href="fileimport" Match="NavLinkMatch.All">Fileimport</MudNavLink>
+            </MudListItem>
+
+            <MudListItem Class="px-3">
+                <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.DeleteSweep" Href="trashcan" Match="NavLinkMatch.All">Trashcan</MudNavLink>
+            </MudListItem>
         }
-    </ul>
+
+        <MudListItem Class="px-3">
+            <MudNavLink IconColor="Color.Warning" Icon="@Icons.Material.Filled.Lightbulb" Href="todo" Match="NavLinkMatch.All">To-Do</MudNavLink>
+        </MudListItem>
+
+    </MudList>
 </div>

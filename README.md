@@ -1,45 +1,45 @@
 # BlazorLibrary
-A library for video games on the computer, created using .NET Core 7.0 with MAUI and Blazor!
-
-#### Until further notice, the formatting of many things are broken because of the port to MAUI, many things have to be edited.
+A library for games, created using .NET Core 7.0 with MAUI (Blazor)!
 
 ## Technologies
 
 ### Created using
-- Blazor-Server based on .NET Core 7.0
-    - Bootstrap 4.3.1
-    - JQuery 3.3.1
-    - PopperJs 1.14.7
-    - Various nugets
-    - https://html2canvas.hertzen.com
+- MAUI (Blazor) on .NET Core 7.0
 
 ### Nuget(s)
-- Microsoft.Windows.SDK.BuildTools             10.0.22621.1
-- Microsoft.AspNetCore.Components.WebView.Maui 7.0.49      
-- Blazored.Modal                               7.1.0       
-- Microsoft.Extensions.DependencyInjection     7.0.0       
-- HtmlAgilityPack                              1.11.46     
-- System.Data.SQLite                           1.0.116     
-- Microsoft.Extensions.Logging                 7.0.0       
-- CsvHelper                                    30.0.0      
-- Microsoft.Extensions.Logging.Abstractions    7.0.0       
-- Newtonsoft.Json                              13.0.1      
-- Microsoft.WindowsAppSDK                      1.1.5       
-- Microsoft.Maui.Graphics.Win2D.WinUI.Desktop  7.0.49      
-- Microsoft.Maui.Graphics                      7.0.49      
-- Microsoft.Extensions.Logging.Debug           7.0.0       
-- Microsoft.Extensions.Configuration           7.0.0
+- Microsoft.Windows.SDK.BuildTools
+- Microsoft.AspNetCore.Components.WebView.Maui
+- Blazored.Modal
+- Microsoft.Extensions.DependencyInjection   
+- HtmlAgilityPack   
+- System.Data.SQLite 
+- Microsoft.Extensions.Logging
+- CsvHelper   
+- Microsoft.Extensions.Logging.Abstractions     
+- Newtonsoft.Json 
+- Microsoft.WindowsAppSDK     
+- Microsoft.Maui.Graphics.Win2D.WinUI.Desktop  
+- Microsoft.Maui.Graphics   
+- Microsoft.Extensions.Logging.Debug 
+- Microsoft.Extensions.Configuration
+- https://html2canvas.hertzen.com
+- [MudBlazor](https://github.com/MudBlazor/MudBlazor)!
+- [RawgNet](https://github.com/liebki/RawgNET)
+
 
 ### External Sources (API's)
-- MMOGA 
+- MMOGA [MmogaNet is coming](https://github.com/liebki/MMOGANet)
     - Pricing (If game is found)
-- Rawg.io 
+- Rawg.io ([RawgNet](https://github.com/liebki/RawgNET))
     - Pictures and metacritic-value (If game is found)
 
 ## Features
 
 ### General
-- Keep a library of your games, with images, genre etc.
+- A library of your games, with images, genre etc.
+
+### Login
+- Login or register a account (everything locally in sqlite!) to comment and have different games/genre visible per user
 
 ### Games
 - Add games with (name, description, picture (GIF's work), path to executeable and one or more genre)
@@ -52,7 +52,6 @@ A library for video games on the computer, created using .NET Core 7.0 with MAUI
     - Start games using the executeable
     - Favorize them
     - Rate them using stars (1-5) and write a text for the rating
-    - Print the game (Not very beautiful, but it works)
 #####
 - Games will be displayed with prices, image and metacritic-value (if game is found)
     - The prices are not very accurate and may be wrong, I'm still working on a new and better scraper.
@@ -62,10 +61,11 @@ A library for video games on the computer, created using .NET Core 7.0 with MAUI
 - Add genre
 - Edit and delete genre
 - Add genre using .csv file import
+
 ## Installation
 
 - Download the project files
-- Start the BlazorApp.csproj file
+- Open the BlazorLibrary.sln file
 - Download the nuget packages
 - Start or build the project
 
@@ -102,19 +102,17 @@ For purposes of the foregoing, “Sell” means practicing any or all of the rig
 [commonsclause](https://commonsclause.com/)
 ## Screenshots
 
-![Library Example Picture](https://kmliebl.de/blazorlibraryscreenshots/library-ow.png)
-(Old, before MAUI port, new one will follow if everything works as planned)
+![Library Example Picture](https://kmliebl.de/blazorlibraryscreenshots/blazorlibrary-maui.PNG)
 
 ## Roadmap
 
-1.
-- Wishlist
-- Change API-Key, etc. basically edit config while app is running in an interface!
-
-2.
-- Remove or upgrade print function (hell on earth in maui, I can tell you)
-- Reduce or optimize code (in general) (with maui?)
-- Change rating menu
-- Integrate mmoga and rawg api (now that I created those two)
+- Internal cleaning and code reduction
+- Settings, to change various things (ApplicationSettingsFile.json)
+- Being able to comment, not the review like a bigger text to comment a game
+- Import data from various sources, like databases etc.
+- Better price querying [MmogaNet](https://github.com/liebki/MMOGANet)
+- Reintroduce the print feature but better
+- Maybe get the To-Do's directly of GitHub?
+- Export the games, genres or everything
 - Language files, to change language
 - Integrate platforms like steam and such

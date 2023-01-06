@@ -9,12 +9,44 @@ namespace BlazorLibrary.Pages
     partial class Anmeldung
     {
         [Inject]
-        NavigationManager NavMan { get; set; }
-        [Inject]
-        SQLiteManager SqlMan { get; set; }
+        private NavigationManager NavMan { get; set; }
 
-        private static string Nickname { get; set; }
-        private static string Passcode { get; set; }
+        [Inject]
+        private SQLiteManager SqlMan { get; set; }
+
+        private string Nickname { get; set; }
+        private string Passcode { get; set; }
+
+        private string DeletionConfirmField { get; set; } = string.Empty;
+        private bool DeletionButtonState { get; set; } = true;
+
+        private async Task TryUserDeletion()
+        {
+            if (DeletionConfirmField.Equals("delete"))
+            {
+                await SqlMan.DeleteLibraryUser(Manager.ActiveUser);
+                await Application.Current.MainPage.DisplayAlert("Alert", "Account was deleted!", "OK");
+
+                await TryUserLogout();
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Alert", "Confirmation was not given!", "OK");
+            }
+            DeletionConfirmField = string.Empty;
+        }
+
+        private bool DeletionTextFieldCheck(string feld)
+        {
+            if (feld.Contains("delete"))
+            {
+                DeletionButtonState = false;
+                return true;
+            }
+            DeletionButtonState = true;
+            return false;
+        }
+
         private async Task TryUserLogin()
         {
             bool IsCredentialsUnvalid = false;
@@ -44,7 +76,6 @@ namespace BlazorLibrary.Pages
                     {
                         await Application.Current.MainPage.DisplayAlert("Alert", "You have been logged in!", "OK");
                         Manager.ActiveUser = LoginVersuch.Item1;
-
                     }
                     else if (LoginVersuch.Item2 == UserCase.Createable)
                     {

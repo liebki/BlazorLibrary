@@ -1,7 +1,9 @@
-﻿
-using BlazorLibrary.Modelle;
+﻿using System.Text;
 
 using Blazored.Modal.Services;
+
+using BlazorLibrary.Management;
+using BlazorLibrary.Modelle;
 using BlazorLibrary.Pages.Komponenten;
 
 using Microsoft.AspNetCore.Components;
@@ -19,9 +21,25 @@ namespace BlazorLibrary.Pages
         private void ShowModal() => Modal.Show<Confirm>(Nachricht);
 
         public string NeuesGenre { get; set; }
-        public int[] auswahlgenre { get; set; } = { };
         public Genre editgenre { get; set; }
         public Genre[] GenreListe { get; set; }
+        private IEnumerable<Genre> auswahlGenre { get; set; } = new HashSet<Genre>();
+
+        private IEnumerable<Genre> AuswahlGenre
+        {
+            get
+            {
+                return auswahlGenre;
+            }
+            set
+            {
+                auswahlGenre = value;
+                if (AuswahlGenre.Count() == 1)
+                {
+                    editgenre = AuswahlGenre.First();
+                }
+            }
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -32,26 +50,12 @@ namespace BlazorLibrary.Pages
             }
         }
 
-        public int[] AuswahlGenre
-        {
-            get
-            {
-                return auswahlgenre;
-            }
-            set
-            {
-                auswahlgenre = value;
-                if (AuswahlGenre.Length > 0)
-                {
-                    editgenre = _db.BestimmtesGenreErhalten(auswahlgenre[0]);
-                }
-            }
-        }
+        private Func<Genre, string> GenreIdToGenreName = g => g?.Name;
 
         public async Task AendereGenre()
         {
             await _db.RenameGenre(editgenre);
-            navMan.NavigateTo($"/genreverwalten?Nachricht=You renamed a genre to {editgenre.Name}", true);
+            //navMan.NavigateTo($"/genreverwalten?Nachricht=You renamed a genre to {editgenre.Name}", true);
 
             await HoleDaten();
         }
@@ -60,8 +64,8 @@ namespace BlazorLibrary.Pages
         {
             if (!(NeuesGenre.Length > 0 && string.IsNullOrWhiteSpace(NeuesGenre)))
             {
-                await _db.CreateGenreInDatabase(NeuesGenre);
-                navMan.NavigateTo($"/genreverwalten?Nachricht=You created the genre {NeuesGenre}", true);
+                await _db.CreateGenreInDatabase(NeuesGenre, Manager.ActiveUser);
+                //navMan.NavigateTo($"/genreverwalten?Nachricht=You created the genre {NeuesGenre}", true);
 
                 NeuesGenre = string.Empty;
                 await HoleDaten();
@@ -73,44 +77,45 @@ namespace BlazorLibrary.Pages
             int GenreAnzahlWahl = AuswahlGenre.Count();
             if (GenreAnzahlWahl >= 0)
             {
-                bool konflikt = await _db.SpielGenreCheck(AuswahlGenre);
+                bool konflikt = await _db.SpielGenreCheck(AuswahlGenre, Manager.ActiveUser);
                 if (!konflikt)
                 {
-                    string msg = "You deleted the genre ";
+                    string msg = "You deleted the genre";
                     if (GenreAnzahlWahl > 1)
                     {
-                        msg = "You deleted the genre ";
+                        msg += "s";
                     }
 
-                    Genre[] liste = await _db.AlleGenreErhalten();
-                    string GenreNamen = string.Empty;
+                    Genre[] liste = await _db.AlleGenreErhalten(Manager.ActiveUser);
+                    StringBuilder GenreNamen = new();
 
-                    foreach (int i in AuswahlGenre)
+                    foreach (Genre g in AuswahlGenre)
                     {
                         foreach (Genre genre in liste)
                         {
-                            if (genre.Id.Equals(i))
+                            if (genre.Id.Equals(g))
                             {
-                                GenreNamen += $"{genre.Name} ";
+                                GenreNamen.Append(g.Name);
                             }
                         }
                     }
                     await _db.DeleteGenreInDatabase(AuswahlGenre);
-                    navMan.NavigateTo($"/genreverwalten?Nachricht={msg}{GenreNamen}", true);
+                    await Manager.MauiDialog("Information", $"{msg} {GenreNamen}");
 
+                    navMan.NavigateTo("/genres", true);
                     await HoleDaten();
                 }
                 else
                 {
-                    navMan.NavigateTo("/genreverwalten?Nachricht=Some game(s) still use one or more genre!", true);
+                    await Manager.MauiDialog("Information", "Some game(s) still use one or more genre(s), could not delete!");
                 }
             }
         }
 
         private async Task HoleDaten()
         {
-            Genre[] genreList = await _db.AlleGenreErhalten();
-            if (!object.Equals(null, genreList))
+            Genre[] genreList = await _db.AlleGenreErhalten(Manager.ActiveUser);
+            if (genreList != null)
             {
                 GenreListe = genreList;
                 StateHasChanged();

@@ -1,8 +1,9 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 
-using BlazorLibrary.Modelle;
 using BlazorLibrary.Management;
+
+using BlazorLibrary.Modelle;
 using BlazorLibrary.Modelle.Csv;
 using BlazorLibrary.Modelle.Nutzer;
 
@@ -14,14 +15,13 @@ namespace BlazorLibrary.Data
 
         public static void SetupDatabase()
         {
-            ExecuteQuery("CREATE TABLE IF NOT EXISTS spiele (id INT, name TEXT, beschreibung TEXT, bildlink TEXT, exepfad TEXT, sternetooltip TEXT,favorit INT, sterne INT, papierkorb INT, metacritic TEXT, estimatedprice TEXT, PRIMARY KEY(id))");
-            ExecuteQuery("CREATE TABLE IF NOT EXISTS genre (id INT, name TEXT, PRIMARY KEY(id))");
+            ExecuteQuery("CREATE TABLE IF NOT EXISTS spiele (id INT, owner INT, name TEXT, beschreibung TEXT, bildlink TEXT, exepfad TEXT, sternetooltip TEXT,favorit INT, sterne INT, papierkorb INT, metacritic TEXT, estimatedprice TEXT, PRIMARY KEY(id))");
+            ExecuteQuery("CREATE TABLE IF NOT EXISTS genre (id INT, owner INT, name TEXT, PRIMARY KEY(id))");
             ExecuteQuery("CREATE TABLE IF NOT EXISTS spielgenre (spielid INT, genreid INT, PRIMARY KEY (spielid, genreid))");
             ExecuteQuery("CREATE TABLE IF NOT EXISTS nutzer (id INT, name TEXT, pincode INT, PRIMARY KEY (id))");
 
             //Kommentare und Ids
             ExecuteQuery("CREATE TABLE IF NOT EXISTS kommentare (id INT, kommentartext TEXT, PRIMARY KEY (id))");
-            //Spieletable anpassen wegen Ids
         }
 
         private static SQLiteConnection HoleConnnection()
@@ -34,94 +34,96 @@ namespace BlazorLibrary.Data
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
-                using (SQLiteCommand comm = con.CreateCommand())
-                {
-                    comm.CommandText = cmd;
-                    comm.ExecuteNonQuery();
-                }
+                using SQLiteCommand comm = con.CreateCommand();
+
+                comm.CommandText = cmd;
+                comm.ExecuteNonQuery();
             }
         }
 
-        public async Task CsvInsertGenreInDatabase(List<CsvGenre> genreListe)
+        public async Task CsvInsertGenreInDatabase(List<CsvGenre> genreListe, LibraryUser nutzer)
         {
             foreach (CsvGenre genre in genreListe)
             {
-                await CreateGenreInDatabase(genre.Name);
+                await CreateGenreInDatabase(genre.Name, nutzer);
             }
         }
 
-        public async Task CsvInsertSpieleInDatabase(List<CsvSpiel> spieleliste)
+        public async Task CsvInsertSpieleInDatabase(List<CsvSpiel> spieleliste, LibraryUser nutzer)
         {
             foreach (CsvSpiel spiel in spieleliste)
             {
-                await CreateGameInDatabase(spiel.Name, spiel.Beschreibung, spiel.Bildlink, spiel.Exepfad, string.Empty, 0, 0, 0, string.Empty, string.Empty);
+                await CreateGameInDatabase(spiel.Name, nutzer, spiel.Beschreibung, spiel.Bildlink, spiel.Exepfad, string.Empty, 0, 0, 0, string.Empty, string.Empty);
             }
         }
 
-        public Task<int> CreateGameInDatabase(string name, string beschreibung = "", string bild = "", string exepfad = "", string sternetooltip = "", int favorit = 0, int sterne = 0, int papierkorb = 0, string metacritic = "", string estimatedprice = "")
+        public async Task<int> CreateGameInDatabase(string name, LibraryUser nutzer, string beschreibung = "", string bild = "", string exepfad = "", string sternetooltip = "", int favorit = 0, int sterne = 0, int papierkorb = 0, string metacritic = "", string estimatedprice = "")
         {
-            Manager.RemoveNullValues(ref beschreibung, ref exepfad);
-            Manager.AddExternalSource(name, ref bild, ref metacritic, ref estimatedprice);
+            (string _beschreibung, string _exepfad) = Manager.RemoveNullValues(beschreibung, exepfad);
 
+            beschreibung = _beschreibung;
+            exepfad = _exepfad;
+
+            (string _bild, string _metacriticvalue, string _estimatedprice) = await Manager.AddExternalSource(name);
             int spieldbid = Manager.RandomSpielNummer();
+
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
                 using (SQLiteCommand comm = con.CreateCommand())
                 {
-                    comm.CommandText = "INSERT INTO spiele (id, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice) VALUES(@Id, @Name, @Beschreibung, @Bild, @Exepfad, @Sternetooltip, @Favorit, @Sterne, @Papierkorb, @Metacritic, @Estimatedprice)";
+                    comm.CommandText = "INSERT INTO spiele (id, owner, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice) VALUES(@Id, @Owner, @Name, @Beschreibung, @Bild, @Exepfad, @Sternetooltip, @Favorit, @Sterne, @Papierkorb, @Metacritic, @Estimatedprice)";
                     comm.CommandType = CommandType.Text;
 
                     comm.Parameters.Add(new("@Id", spieldbid));
+                    comm.Parameters.Add(new("@Owner", nutzer.Id));
+
                     comm.Parameters.Add(new("@Name", name));
-
                     comm.Parameters.Add(new("@Beschreibung", beschreibung));
-                    comm.Parameters.Add(new("@Bild", bild));
 
+                    comm.Parameters.Add(new("@Bild", _bild));
                     comm.Parameters.Add(new("@Exepfad", exepfad));
+
                     comm.Parameters.Add(new("@Sternetooltip", sternetooltip));
-
                     comm.Parameters.Add(new("@Favorit", favorit));
+
                     comm.Parameters.Add(new("@Sterne", sterne));
-
                     comm.Parameters.Add(new("@Papierkorb", papierkorb));
-                    comm.Parameters.Add(new("@Metacritic", metacritic));
 
-                    comm.Parameters.Add(new("@Estimatedprice", estimatedprice));
-                    comm.ExecuteNonQueryAsync();
+                    comm.Parameters.Add(new("@Metacritic", _metacriticvalue));
+                    comm.Parameters.Add(new("@Estimatedprice", _estimatedprice));
+
+                    await comm.ExecuteNonQueryAsync();
                 }
             }
-            return Task.FromResult(spieldbid);
+            return spieldbid;
         }
 
         public async Task UpdateSpielInDatabase(Spiel spiel)
         {
-            string metacritic = "!";
-            string estimatedprice = "!";
-
             string bild = spiel.Bildlink;
-            Manager.AddExternalSource(spiel.Name, ref bild, ref metacritic, ref estimatedprice);
+            (string _bild, string _metacriticvalue, string _estimatedprice) = await Manager.AddExternalSource(spiel.Name, bild);
 
+            bild = _bild;
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
-                using (SQLiteCommand comm = con.CreateCommand())
-                {
-                    comm.CommandText = "UPDATE spiele SET name=@Name, beschreibung=@Beschreibung, bildlink=@Bildlink, exepfad=@Exepfad, metacritic=@Metacritic, estimatedprice=@Estimatedprice WHERE id=@Id";
-                    comm.CommandType = CommandType.Text;
+                using SQLiteCommand comm = con.CreateCommand();
 
-                    comm.Parameters.Add(new("@Name", spiel.Name));
-                    comm.Parameters.Add(new("@Beschreibung", spiel.Beschreibung));
+                comm.CommandText = "UPDATE spiele SET name=@Name, beschreibung=@Beschreibung, bildlink=@Bildlink, exepfad=@Exepfad, metacritic=@Metacritic, estimatedprice=@Estimatedprice WHERE id=@Id";
+                comm.CommandType = CommandType.Text;
 
-                    comm.Parameters.Add(new("@Bildlink", bild));
-                    comm.Parameters.Add(new("@Exepfad", spiel.Exepfad));
+                comm.Parameters.Add(new("@Name", spiel.Name));
+                comm.Parameters.Add(new("@Beschreibung", spiel.Beschreibung));
 
-                    comm.Parameters.Add(new("@Metacritic", metacritic));
-                    comm.Parameters.Add(new("@Estimatedprice", estimatedprice));
+                comm.Parameters.Add(new("@Bildlink", bild));
+                comm.Parameters.Add(new("@Exepfad", spiel.Exepfad));
 
-                    comm.Parameters.Add(new("@Id", spiel.Id));
-                    await comm.ExecuteNonQueryAsync();
-                }
+                comm.Parameters.Add(new("@Metacritic", _metacriticvalue));
+                comm.Parameters.Add(new("@Estimatedprice", _estimatedprice));
+
+                comm.Parameters.Add(new("@Id", spiel.Id));
+                await comm.ExecuteNonQueryAsync();
             }
         }
 
@@ -144,23 +146,21 @@ namespace BlazorLibrary.Data
             }
         }
 
-        public async Task SaveGenreOfGame(int spielid, int[] genreIds)
+        public async Task SaveGenreOfGame(int spielid, IEnumerable<Genre> genreIds)
         {
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
-                foreach (int IdGenre in genreIds)
+                foreach (Genre gr in genreIds)
                 {
-                    using (SQLiteCommand comm = con.CreateCommand())
-                    {
-                        comm.CommandText = "INSERT INTO spielgenre (spielid,genreid) VALUES(@Spielid,@Genreid)";
-                        comm.CommandType = CommandType.Text;
+                    using SQLiteCommand comm = con.CreateCommand();
+                    comm.CommandText = "INSERT INTO spielgenre (spielid,genreid) VALUES(@Spielid,@Genreid)";
 
-                        comm.Parameters.Add(new("@Spielid", spielid));
-                        comm.Parameters.Add(new("@Genreid", IdGenre));
+                    comm.CommandType = CommandType.Text;
+                    comm.Parameters.Add(new("@Spielid", spielid));
 
-                        await comm.ExecuteNonQueryAsync();
-                    }
+                    comm.Parameters.Add(new("@Genreid", gr.Id));
+                    await comm.ExecuteNonQueryAsync();
                 }
             }
         }
@@ -238,16 +238,17 @@ namespace BlazorLibrary.Data
             return User;
         }
 
-        public async Task<bool> SpielGenreCheck(int[] genreids)
+        public async Task<bool> SpielGenreCheck(IEnumerable<Genre> genreids, LibraryUser nutzer)
         {
             bool spielNutztGenre = false;
-            List<Spiel> AktuelleSpieleListe = await SpieleListeErhalten();
+            List<Spiel> AktuelleSpieleListe = await SpieleListeErhalten(nutzer);
+
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
                 foreach (Spiel spiel in AktuelleSpieleListe)
                 {
-                    foreach (int IdGenre in genreids)
+                    foreach (Genre gr in genreids)
                     {
                         using (SQLiteCommand comm = con.CreateCommand())
                         {
@@ -255,7 +256,7 @@ namespace BlazorLibrary.Data
                             comm.CommandType = CommandType.Text;
 
                             comm.Parameters.Add(new("@spielid", spiel.Id));
-                            comm.Parameters.Add(new("@genreid", IdGenre));
+                            comm.Parameters.Add(new("@genreid", gr.Id));
 
                             SQLiteDataReader r = comm.ExecuteReader();
                             while (r.Read())
@@ -296,6 +297,44 @@ namespace BlazorLibrary.Data
             }
         }
 
+        private async Task DeleteUser(LibraryUser nutzer)
+        {
+            using (SQLiteConnection con = HoleConnnection())
+            {
+                con.Open();
+                using (SQLiteCommand comm = con.CreateCommand())
+                {
+                    comm.CommandText = "DELETE FROM nutzer WHERE id=@Id";
+                    comm.CommandType = CommandType.Text;
+
+                    comm.Parameters.Add(new("@Id", nutzer.Id));
+                    await comm.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+        private async Task DeleteAllUserrelatedGames(LibraryUser nutzer)
+        {
+            List<Spiel> UserGames = await SpieleListeErhalten(nutzer);
+            foreach (Spiel sp in UserGames)
+            {
+                await RemoveAllGenreOfGame(sp.Id);
+                await DeleteSpielCompletely(sp);
+            }
+
+            Genre[] UserGenres = await AlleGenreErhalten(nutzer);
+            foreach (Genre gr in UserGenres)
+            {
+                await DeleteGenre(gr.Id);
+            }
+        }
+
+        public async Task DeleteLibraryUser(LibraryUser nutzer)
+        {
+            await DeleteUser(nutzer);
+            await DeleteAllUserrelatedGames(nutzer);
+        }
+
         public async Task DeleteSpielCompletely(Spiel spiel)
         {
             using (SQLiteConnection con = HoleConnnection())
@@ -312,26 +351,41 @@ namespace BlazorLibrary.Data
             }
         }
 
-        public async Task DeleteGenreInDatabase(int[] genreids)
+        public async Task DeleteGenre(int genreid)
         {
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
-                foreach (int IdGenre in genreids)
+                using SQLiteCommand comm = con.CreateCommand();
+
+                comm.CommandText = "DELETE FROM genre WHERE id=@Id";
+                comm.CommandType = CommandType.Text;
+
+                comm.Parameters.Add(new("@Id", genreid));
+                await comm.ExecuteNonQueryAsync();
+            }
+        }
+
+        public async Task DeleteGenreInDatabase(IEnumerable<Genre> genreids)
+        {
+            using (SQLiteConnection con = HoleConnnection())
+            {
+                con.Open();
+                foreach (Genre gr in genreids)
                 {
                     using (SQLiteCommand comm = con.CreateCommand())
                     {
                         comm.CommandText = "DELETE FROM genre WHERE id=@Id";
                         comm.CommandType = CommandType.Text;
 
-                        comm.Parameters.Add(new("@Id", IdGenre));
+                        comm.Parameters.Add(new("@Id", gr.Id));
                         await comm.ExecuteNonQueryAsync();
                     }
                 }
             }
         }
 
-        public async Task CreateGenreInDatabase(string name)
+        public async Task CreateGenreInDatabase(string name, LibraryUser nutzer)
         {
             int genreid = Manager.RandomGenreNummer();
             using (SQLiteConnection con = HoleConnnection())
@@ -339,12 +393,13 @@ namespace BlazorLibrary.Data
                 con.Open();
                 using (SQLiteCommand comm = con.CreateCommand())
                 {
-                    comm.CommandText = "INSERT INTO genre (id,name) VALUES (@genreid,@genrename)";
+                    comm.CommandText = "INSERT INTO genre (id, owner, name) VALUES (@genreid, @Owner, @genrename)";
                     comm.CommandType = CommandType.Text;
 
                     comm.Parameters.Add(new("@genreid", genreid));
-                    comm.Parameters.Add(new("@genrename", name));
+                    comm.Parameters.Add(new("@Owner", nutzer.Id));
 
+                    comm.Parameters.Add(new("@genrename", name));
                     await comm.ExecuteNonQueryAsync();
                 }
             }
@@ -406,27 +461,30 @@ namespace BlazorLibrary.Data
 
         public Genre BestimmtesGenreErhalten(int genreid)
         {
-            string genrename = string.Empty;
+            Genre SearchedGenre = new(genreid, 0, string.Empty);
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
                 using (SQLiteCommand comm = con.CreateCommand())
                 {
-                    comm.CommandText = "SELECT name FROM genre WHERE id=@Id";
-                    comm.Parameters.Add(new("@Id", genreid));
+                    comm.CommandText = "SELECT name, owner FROM genre WHERE id=@Id";
+                    comm.Parameters.Add(new("@Id", SearchedGenre.Id));
 
                     SQLiteDataReader r = comm.ExecuteReader();
                     while (r.Read())
                     {
                         string name = (string)r["name"];
-                        genrename = name;
+                        int owner = (int)r["owner"];
+
+                        SearchedGenre.Name = name;
+                        SearchedGenre.Owner = owner;
                     }
                 }
             }
-            return new Genre(genreid, genrename);
+            return SearchedGenre;
         }
 
-        public Task<Genre[]> AlleGenreErhalten()
+        public Task<Genre[]> AlleGenreErhalten(LibraryUser nutzer)
         {
             List<Genre> genreList = new();
             using (SQLiteConnection con = HoleConnnection())
@@ -434,15 +492,19 @@ namespace BlazorLibrary.Data
                 con.Open();
                 using (SQLiteCommand comm = con.CreateCommand())
                 {
-                    comm.CommandText = "SELECT id, name FROM genre";
+                    comm.CommandText = "SELECT id, owner, name FROM genre";
                     SQLiteDataReader r = comm.ExecuteReader();
 
                     while (r.Read())
                     {
                         int id = (int)r["id"];
-                        string name = (string)r["name"];
+                        int owner = (int)r["owner"];
 
-                        genreList.Add(new Genre(id, name));
+                        string name = (string)r["name"];
+                        if (owner == nutzer.Id)
+                        {
+                            genreList.Add(new Genre(id, owner, name));
+                        }
                     }
                 }
             }
@@ -451,7 +513,7 @@ namespace BlazorLibrary.Data
 
         public string[] GenreVonSpielErhalten(int spielid)
         {
-            List<String> genreList = new();
+            List<string> genreList = new();
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
@@ -477,19 +539,18 @@ namespace BlazorLibrary.Data
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
-                using (SQLiteCommand comm = con.CreateCommand())
+                using SQLiteCommand comm = con.CreateCommand();
+                comm.CommandText = "SELECT genre.id, genre.owner, genre.name FROM spielgenre JOIN spiele ON spielgenre.spielid = spiele.id JOIN genre ON spielgenre.genreid = genre.id WHERE spiele.id=@spielid";
+                comm.Parameters.Add(new("@spielid", spielid));
+
+                SQLiteDataReader r = comm.ExecuteReader();
+                while (r.Read())
                 {
-                    comm.CommandText = "SELECT genre.id, genre.name FROM spielgenre JOIN spiele ON spielgenre.spielid = spiele.id JOIN genre ON spielgenre.genreid = genre.id WHERE spiele.id=@spielid";
-                    comm.Parameters.Add(new("@spielid", spielid));
+                    int id = (int)r["id"];
+                    int owner = (int)r["owner"];
 
-                    SQLiteDataReader r = comm.ExecuteReader();
-                    while (r.Read())
-                    {
-                        int id = (int)r["id"];
-                        string name = (string)r["name"];
-
-                        genreList.Add(new Genre(id, name));
-                    }
+                    string name = (string)r["name"];
+                    genreList.Add(new Genre(id, owner, name));
                 }
             }
             return genreList.ToArray();
@@ -501,108 +562,116 @@ namespace BlazorLibrary.Data
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
-                using (SQLiteCommand fmd = con.CreateCommand())
+                using SQLiteCommand fmd = con.CreateCommand();
+
+                fmd.CommandText = "SELECT id, owner, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice FROM spiele WHERE id=@SpielId";
+                fmd.Parameters.Add(new("@spielid", SpielId));
+
+                SQLiteDataReader r = fmd.ExecuteReader();
+                while (r.Read())
                 {
-                    fmd.CommandText = "SELECT id, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice FROM spiele WHERE id=@SpielId";
-                    fmd.Parameters.Add(new("@spielid", SpielId));
+                    int id = (int)r["id"];
+                    int owner = (int)r["owner"];
 
-                    SQLiteDataReader r = fmd.ExecuteReader();
-                    while (r.Read())
-                    {
-                        int id = (int)r["id"];
-                        string name = (string)r["name"];
+                    string name = (string)r["name"];
+                    string beschreibung = (string)r["beschreibung"];
 
-                        string beschreibung = (string)r["beschreibung"];
-                        string bildlink = (string)r["bildlink"];
+                    string bildlink = (string)r["bildlink"];
+                    string exepfad = (string)r["exepfad"];
 
-                        string exepfad = (string)r["exepfad"];
-                        string sternetooltip = (string)r["sternetooltip"];
+                    string sternetooltip = (string)r["sternetooltip"];
+                    int fav = (int)r["favorit"];
 
-                        int fav = (int)r["favorit"];
-                        int sterne = (int)r["sterne"];
+                    int sterne = (int)r["sterne"];
+                    int papierkorb = (int)r["papierkorb"];
 
-                        int papierkorb = (int)r["papierkorb"];
-                        string metacritic = (string)r["metacritic"];
+                    string metacritic = (string)r["metacritic"];
+                    string estimatedprice = (string)r["estimatedprice"];
 
-                        string estimatedprice = (string)r["estimatedprice"];
-                        Genre[] genrelist = GenreArrayVonSpielErhalten(id);
-
-                        spiel = new(id, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, papierkorb, metacritic, estimatedprice, genrelist);
-                    }
+                    Genre[] genrelist = GenreArrayVonSpielErhalten(id);
+                    spiel = new(id, owner, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, papierkorb, metacritic, estimatedprice, genrelist);
                 }
             }
             return Task.FromResult(spiel);
         }
 
-        public async Task<List<Spiel>> SpieleListeErhalten()
+        public async Task<List<Spiel>> SpieleListeErhalten(LibraryUser nutzer)
         {
             List<Spiel> spiele = new();
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
-                using (SQLiteCommand fmd = con.CreateCommand())
+                using SQLiteCommand fmd = con.CreateCommand();
+
+                fmd.CommandText = "SELECT id, owner, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice FROM spiele";
+                SQLiteDataReader r = fmd.ExecuteReader();
+
+                while (r.Read())
                 {
-                    fmd.CommandText = "SELECT id, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice FROM spiele";
-                    SQLiteDataReader r = fmd.ExecuteReader();
+                    int id = (int)r["id"];
+                    int owner = (int)r["owner"];
 
-                    while (r.Read())
+                    string name = (string)r["name"];
+                    string beschreibung = (string)r["beschreibung"];
+
+                    string bildlink = ConvertFromDBVal<string>(r["bildlink"]);
+                    string exepfad = (string)r["exepfad"];
+
+                    string sternetooltip = (string)r["sternetooltip"];
+                    int fav = (int)r["favorit"];
+
+                    int sterne = (int)r["sterne"];
+                    int papierkorb = (int)r["papierkorb"];
+
+                    string metacritic = (string)r["metacritic"];
+                    string estimatedprice = (string)r["estimatedprice"];
+
+                    Genre[] genrelist = GenreArrayVonSpielErhalten(id);
+
+                    if (owner == nutzer.Id)
                     {
-                        int id = (int)r["id"];
-                        string name = (string)r["name"];
-
-                        string beschreibung = (string)r["beschreibung"];
-                        string bildlink = ConvertFromDBVal<string>(r["bildlink"]);
-
-                        string exepfad = (string)r["exepfad"];
-                        string sternetooltip = (string)r["sternetooltip"];
-
-                        int fav = (int)r["favorit"];
-                        int sterne = (int)r["sterne"];
-
-                        int papierkorb = (int)r["papierkorb"];
-                        string metacritic = (string)r["metacritic"];
-
-                        string estimatedprice = (string)r["estimatedprice"];
-                        Genre[] genrelist = GenreArrayVonSpielErhalten(id);
-
-                        spiele.Add(new Spiel(id, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, papierkorb, metacritic, estimatedprice, genrelist));
+                        spiele.Add(new Spiel(id, owner, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, papierkorb, metacritic, estimatedprice, genrelist));
                     }
                 }
             }
             return spiele;
         }
 
-        public async Task<List<Spiel>> GeloeschteSpieleListeErhalten()
+        public async Task<List<Spiel>> GeloeschteSpieleListeErhalten(LibraryUser nutzer)
         {
             List<Spiel> spiele = new();
             using (SQLiteConnection con = HoleConnnection())
             {
                 con.Open();
-                using (SQLiteCommand fmd = con.CreateCommand())
+                using SQLiteCommand fmd = con.CreateCommand();
+
+                fmd.CommandText = "SELECT id, owner, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne,  metacritic, estimatedprice FROM spiele WHERE papierkorb=1";
+                SQLiteDataReader r = fmd.ExecuteReader();
+
+                while (r.Read())
                 {
-                    fmd.CommandText = "SELECT id, name, beschreibung, bildlink, exepfad, sternetooltip, favorit, sterne, papierkorb, metacritic, estimatedprice FROM spiele WHERE papierkorb=1";
-                    SQLiteDataReader r = fmd.ExecuteReader();
-                    while (r.Read())
+                    int id = (int)r["id"];
+                    int owner = (int)r["owner"];
+
+                    string name = (string)r["name"];
+                    string beschreibung = (string)r["beschreibung"];
+
+                    string bildlink = (string)r["bildlink"];
+                    string exepfad = (string)r["exepfad"];
+
+                    string sternetooltip = (string)r["sternetooltip"];
+                    int fav = (int)r["favorit"];
+
+                    int sterne = (int)r["sterne"];
+
+                    string metacritic = (string)r["metacritic"];
+                    string estimatedprice = (string)r["estimatedprice"];
+
+                    Genre[] genrelist = GenreArrayVonSpielErhalten(id);
+
+                    if (owner == nutzer.Id)
                     {
-                        int id = (int)r["id"];
-                        string name = (string)r["name"];
-
-                        string beschreibung = (string)r["beschreibung"];
-                        string bildlink = (string)r["bildlink"];
-
-                        string exepfad = (string)r["exepfad"];
-                        string sternetooltip = (string)r["sternetooltip"];
-
-                        int fav = (int)r["favorit"];
-                        int sterne = (int)r["sterne"];
-
-                        int papierkorb = (int)r["papierkorb"];
-                        string metacritic = (string)r["metacritic"];
-
-                        string estimatedprice = (string)r["estimatedprice"];
-                        Genre[] genrelist = GenreArrayVonSpielErhalten(id);
-
-                        spiele.Add(new Spiel(id, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, papierkorb, metacritic, estimatedprice, genrelist));
+                        spiele.Add(new Spiel(id, owner, name, beschreibung, bildlink, exepfad, sternetooltip, fav, sterne, 1, metacritic, estimatedprice, genrelist));
                     }
                 }
             }
@@ -611,15 +680,13 @@ namespace BlazorLibrary.Data
 
         public static async Task ExecuteQueryAsync(string cmd)
         {
-            using (SQLiteConnection con = HoleConnnection())
-            {
-                con.Open();
-                using (SQLiteCommand comm = con.CreateCommand())
-                {
-                    comm.CommandText = cmd;
-                    await comm.ExecuteNonQueryAsync();
-                }
-            }
+            using SQLiteConnection con = HoleConnnection();
+            con.Open();
+
+            using SQLiteCommand comm = con.CreateCommand();
+            comm.CommandText = cmd;
+
+            await comm.ExecuteNonQueryAsync();
         }
 
         public static T ConvertFromDBVal<T>(object obj)

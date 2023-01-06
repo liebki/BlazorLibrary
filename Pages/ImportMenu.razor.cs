@@ -16,6 +16,11 @@ namespace BlazorLibrary.Pages
 
         [CascadingParameter] public IModalService Modal { get; set; }
 
+        private void test()
+        {
+            navMan.NavigateTo("/uhawd", true);
+        }
+
         private void ShowModal() => Modal.Show<Confirm>(Nachricht);
 
         public StreamReader spielcsv { get; set; } = null;
@@ -41,7 +46,7 @@ namespace BlazorLibrary.Pages
 
                 if (CsvSpieleListe.Count > 0)
                 {
-                    await _db.CsvInsertSpieleInDatabase(CsvSpieleListe);
+                    await _db.CsvInsertSpieleInDatabase(CsvSpieleListe, Manager.ActiveUser);
                 }
                 importiert = true;
             }
@@ -53,7 +58,7 @@ namespace BlazorLibrary.Pages
 
                 if (CsvGenreListe.Count > 0)
                 {
-                    await _db.CsvInsertGenreInDatabase(CsvGenreListe);
+                    await _db.CsvInsertGenreInDatabase(CsvGenreListe, Manager.ActiveUser);
                 }
                 importiert = true;
             }

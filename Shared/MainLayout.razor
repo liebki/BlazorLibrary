@@ -6,11 +6,15 @@
     </div>
 
     <div class="main">
-        <div class="top-row px-4">
-            <p>@DateTime.Today.Date.ToString("dd.MM.yyyy")</p>
+        <div class="top-row px-3">
+            <MudText Typo="Typo.body2" Color="Color.Info">Today: @DateTime.Today.Date.ToString("dd.MM.yyyy")</MudText>
         </div>
-        <div class="content px-4">
+        <div class="content px-3">
             @Body
         </div>
     </div>
 </div>
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>

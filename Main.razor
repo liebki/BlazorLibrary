@@ -1,13 +1,17 @@
 ﻿<CascadingBlazoredModal>
     <Router AppAssembly="@typeof(Main).Assembly">
+
         <Found Context="routeData">
             <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
+
         <NotFound>
             <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
+                <MudText Class="mb-2" Typo="Typo.body1" Color="Color.Error">Sorry, there's nothing at this address, please go back:</MudText>
+                <MudButton OnClick="BackToStart" Variant="Variant.Filled" Color="Color.Error">Back</MudButton>
             </LayoutView>
         </NotFound>
+
     </Router>
 </CascadingBlazoredModal>

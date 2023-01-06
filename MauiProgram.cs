@@ -2,9 +2,11 @@
 
 using BlazorLibrary.Data;
 using BlazorLibrary.Management;
+using BlazorLibrary.Modelle.Application;
+
 using Microsoft.Extensions.Logging;
 
-using BlazorLibrary.Modelle.Application;
+using MudBlazor.Services;
 
 namespace BlazorLibrary
 {
@@ -26,28 +28,25 @@ namespace BlazorLibrary
             builder.Logging.AddDebug();
 #endif
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddMudServices();
             builder.Services.AddBlazoredModal();
 
             builder.Services.AddSingleton<SQLiteManager>();
-            builder.Services.AddSingleton<RawgAccessManager>();
 
             builder.Services.AddSingleton<CsvManager>();
-            builder.Services.AddSingleton<MmogaNetManager>();
-
             builder.Services.AddSingleton<RawgNetManager>();
-            SetupLibrary();
 
+            SetupLibrary();
             return builder.Build();
         }
 
         private static void SetupLibrary()
         {
             Einstellungen = Manager.ReadJsonSettingsFile(File.ReadAllText(Path.Combine(Manager.MauiProgramActiveDirectory(), "ApplicationSettingsFile.json")));
-            bool InternetAvailable = Manager.InternetAvailable();
 
             if (Einstellungen is not null)
             {
-                if (!InternetAvailable || Einstellungen.Rawgapikey.Length < 10)
+                if (!Manager.InternetAvailable() || Einstellungen.Rawgapikey.Length < 10)
                 {
                     Einstellungen.Usepricescraper = false;
                     Einstellungen.Userawg = false;

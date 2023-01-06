@@ -3,24 +3,20 @@
 @inject SQLiteManager _db
 @inject CsvManager csvMan
 
-@page "/import"
+@page "/fileimport"
 
 <LoginCheck />
 
-<h1>Import genre or games</h1>
+<MudText Typo="Typo.h4">Importmenu</MudText>
 
 <div class="input-group mb-3">
-  <input @bind="spielcsv_state" type="text" class="form-control" placeholder="Choose a .csv file containing game data">
-  <div class="input-group-append">
-    <button @onclick="() => SelectImportCsv(ImportType.Spiel)" class="btn btn-outline-secondary" type="button">Select</button>
-  </div>
+    <MudTextField @bind-Value="spielcsv_state" Label="Choose a .csv file containing game data" ReadOnly="true" Variant="Variant.Text" />
+    <MudButton OnClick="() => SelectImportCsv(ImportType.Spiel)" Variant="Variant.Filled" Color="Color.Primary">Select</MudButton>
 </div>
 
 <div class="input-group mb-3">
-  <input @bind="genrecsv_state" type="text" class="form-control" placeholder="Choose a .csv file containing genre data">
-  <div class="input-group-append">
-    <button @onclick="() => SelectImportCsv(ImportType.Genre)" class="btn btn-outline-secondary" type="button">Select</button>
-  </div>
+    <MudTextField @bind-Value="genrecsv_state" Label="Choose a .csv file containing genre data" ReadOnly="true" Variant="Variant.Text" />
+    <MudButton OnClick="() => SelectImportCsv(ImportType.Genre)" Variant="Variant.Filled" Color="Color.Primary">Select</MudButton>
 </div>
 
-<button @onclick="VerarbeiteDaten" class="btn btn-primary" type="button">Import</button>
+<MudButton OnClick="VerarbeiteDaten" Variant="Variant.Filled" Color="Color.Success">Import data</MudButton>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace BlazorLibrary.Pages
+namespace BlazorLibrary.Pages.Komponenten
 {
     partial class SterneDarstellung
     {

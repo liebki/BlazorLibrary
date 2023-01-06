@@ -1,11 +1,12 @@
-﻿using BlazorLibrary.Modelle;
-using BlazorLibrary.Management;
+﻿using BlazorLibrary.Management;
+using BlazorLibrary.Modelle;
 
 namespace BlazorLibrary.Pages
 {
     partial class SpielHinzufuegen
     {
         public int[] AuswahlGenre { get; set; } = { };
+        public IEnumerable<Genre> GenreAuswahl { get; set; } = new List<Genre>();
         public Genre[] GenreListe { get; set; }
         private string Name { get; set; }
         private string Beschreibung { get; set; } = string.Empty;
@@ -29,28 +30,30 @@ namespace BlazorLibrary.Pages
 
         public async Task speichereDaten()
         {
-            if (!object.Equals(Name, null) && Name.Length > 1)
+            if (!string.IsNullOrEmpty(Name) && Name.Length > 1)
             {
-                int SpielId = await _db.CreateGameInDatabase(Name, Beschreibung, Bildlink, Exepfad);
+                int SpielId = await _db.CreateGameInDatabase(Name, Manager.ActiveUser, Beschreibung, Bildlink, Exepfad);
                 await _db.RemoveAllGenreOfGame(SpielId);
 
-                if (AuswahlGenre.Length > 0)
+                if (GenreAuswahl.Any())
                 {
-                    await _db.SaveGenreOfGame(SpielId, AuswahlGenre);
+                    await _db.SaveGenreOfGame(SpielId, GenreAuswahl);
                 }
-
-                navMan.NavigateTo($"/?Nachricht=You created the game {Name}", true);
+                await Manager.MauiDialog("Information", $"You created the game {Name}");
+                navMan.NavigateTo("/games", true);
             }
             else
             {
-                navMan.NavigateTo("/?Nachricht=An error occured!", true);
+                await Manager.MauiDialog("Information", $"An error occured, the name is NOT optional!");
             }
         }
 
+        private Func<Genre, string> GenreIdToGenreName = g => g?.Name;
+
         private async Task HoleDaten()
         {
-            Genre[] genreList = await _db.AlleGenreErhalten();
-            if (!object.Equals(null, genreList))
+            Genre[] genreList = await _db.AlleGenreErhalten(Manager.ActiveUser);
+            if (genreList != null)
             {
                 GenreListe = genreList;
                 StateHasChanged();
