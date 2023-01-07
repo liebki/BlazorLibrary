@@ -9,8 +9,8 @@
     <MudList Style="color:white;">
 
         @if (Manager.ActiveUser != null) {
-            <MudListItem Disabled Class="px-3">
-                <MudNavLink Disabled IconColor="Color.Primary" Icon="@Icons.Material.Filled.SettingsApplications" Match="NavLinkMatch.All">Settings</MudNavLink>
+            <MudListItem Class="px-3">
+                <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.SettingsApplications" Href="settings" Match="NavLinkMatch.All">Settings</MudNavLink>
             </MudListItem>
         }
 

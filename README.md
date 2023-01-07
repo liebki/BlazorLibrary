@@ -9,7 +9,6 @@ A library for games, created using .NET Core 7.0 with MAUI (Blazor)!
 ### Nuget(s)
 - Microsoft.Windows.SDK.BuildTools
 - Microsoft.AspNetCore.Components.WebView.Maui
-- Blazored.Modal
 - Microsoft.Extensions.DependencyInjection   
 - HtmlAgilityPack   
 - System.Data.SQLite 
@@ -23,51 +22,53 @@ A library for games, created using .NET Core 7.0 with MAUI (Blazor)!
 - Microsoft.Extensions.Logging.Debug 
 - Microsoft.Extensions.Configuration
 - https://html2canvas.hertzen.com
+    - To use the print feature, nothing else is working besides some old JavaScript
 - [MudBlazor](https://github.com/MudBlazor/MudBlazor)!
+    - For the new design, simply everything from buttons to select's
 - [RawgNet](https://github.com/liebki/RawgNET)
-
-
-### External Sources (API's)
-- MMOGA [MmogaNet is coming](https://github.com/liebki/MMOGANet)
+    - Where the game data comes from
+- [MmogaNet is coming](https://github.com/liebki/MMOGANet)
     - Pricing (If game is found)
-- Rawg.io ([RawgNet](https://github.com/liebki/RawgNET))
-    - Pictures and metacritic-value (If game is found)
 
 ## Features
 
-### General
-- A library of your games, with images, genre etc.
+### What is this?
+- A external library of your games, with images, genre etc.
 
-### Login
+### General
+
+#### Login
 - Login or register a account (everything locally in sqlite!) to comment and have different games/genre visible per user
 
-### Games
+#### Games
 - Add games with (name, description, picture (GIF's work), path to executeable and one or more genre)
 - Edit and delete games
 - Add games using .csv file import
 - Recover games that you deleted from the trashcan or delete them completely
 
-#####
-- Gamescards (Detailed)
-    - Start games using the executeable
-    - Favorize them
-    - Rate them using stars (1-5) and write a text for the rating
-#####
-- Games will be displayed with prices, image and metacritic-value (if game is found)
-    - The prices are not very accurate and may be wrong, I'm still working on a new and better scraper.
-    - The metacritic-values and pictures are directly from the rawg.io api.
+##### Gamescards
+- Start games
+- Favorize them
+- Give them one or more genres
+- Rate them using stars (1-5) and write a text for the rating
+- Estimated prices, images and metacritic-values are visible (if game was found)
+    - The prices are not accurate and may be wrong, should be more accurate with [MmogaNet](https://github.com/liebki/MMOGANet)
+- The metacritic-values and pictures are directly from rawg
 
-### Genre
-- Add genre
-- Edit and delete genre
+#### Genre
+- Add, edit and delete genre
 - Add genre using .csv file import
 
 ## Installation
 
-- Download the project files
-- Open the BlazorLibrary.sln file
-- Download the nuget packages
-- Start or build the project
+1 Download the project files
+2 Open the BlazorLibrary.sln file
+3 Download the nuget packages
+4 Start or build the project
+
+## Installation for usage
+
+You have to download the whole project, MAUI and visual studio are not able to produce a good exportable build right now yet
 
 ## FAQ
 
@@ -79,27 +80,21 @@ I created this on windows 10 and tested it on other windows 10 machines, I cant 
 
 You can apply (get a key) here: https://rawg.io/apidocs
 
-#### Where do I put my rawg.io API-Key?
+#### Where do I put my rawg.io API-Key and change settings?
 
-Look in the "ApplicationSettingsFile.json" file, under "rawgapikey", just paste it in the brackets, and it should work.
+- For now, look in the "ApplicationSettingsFile.json" file, under "rawgapikey", just paste it in the brackets, and it should work.
+- Working on a userfriendly way
 
 ## License
 
-“Commons Clause” License Condition v1.0
-
-The Software is provided to you by the Licensor under the License, as defined below, subject to the following condition.
-
-Without limiting other conditions in the License, the grant of rights under the License will not include, and the License does not grant to you, the right to Sell the Software.
-
-For purposes of the foregoing, “Sell” means practicing any or all of the rights granted to you under the License to provide to third parties, for a fee or other consideration (including without limitation fees for hosting or consulting/ support services related to the Software), a product or service whose value derives, entirely or substantially, from the functionality of the Software. Any license notice or attribution required by the License must also include this Commons Clause License Condition notice.
-
 **Software:** BlazorLibrary
 
-**License:** Apache License 2.0
+**License:** GNU General Public License v3.0
 
 **Licensor:** Kim Mario Liebl
 
-[commonsclause](https://commonsclause.com/)
+[GNU](https://choosealicense.com/licenses/gpl-3.0/)
+
 ## Screenshots
 
 ![Library Example Picture](https://kmliebl.de/blazorlibraryscreenshots/blazorlibrary-maui.PNG)

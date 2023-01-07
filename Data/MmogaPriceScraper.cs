@@ -6,11 +6,6 @@ namespace BlazorLibrary.Data
     {
         private const string MmogaSearchUrl = "https://www.mmoga.de/advanced_search.php?keywords=";
 
-        /// <summary>
-        /// Durch die Eingabe eines Spielenamens, kann ein ungefährer Preis durch MMOGA (unfreiwillig) bereitgestellt werden
-        /// </summary>
-        /// <param name="gamename">Eingabe eines Spielenamens</param>
-        /// <returns></returns>
         public static string GetPreisVonSpiel(string gamename)
         {
             string GameName = FilteNameInput(gamename);

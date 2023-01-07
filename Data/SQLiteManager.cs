@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using System.Data.SQLite;
 
-using BlazorLibrary.Management;
-
 using BlazorLibrary.Modelle;
+
+using BlazorLibrary.Management;
 using BlazorLibrary.Modelle.Csv;
 using BlazorLibrary.Modelle.Nutzer;
 
@@ -11,8 +11,6 @@ namespace BlazorLibrary.Data
 {
     public class SQLiteManager
     {
-        private static readonly string sqliteConString = $"Data Source={Path.Combine(Manager.MauiProgramActiveDirectory(), MauiProgram.Einstellungen.Sqlitedatabasename)}.sqlite;Version=3;";
-
         public static void SetupDatabase()
         {
             ExecuteQuery("CREATE TABLE IF NOT EXISTS spiele (id INT, owner INT, name TEXT, beschreibung TEXT, bildlink TEXT, exepfad TEXT, sternetooltip TEXT,favorit INT, sterne INT, papierkorb INT, metacritic TEXT, estimatedprice TEXT, PRIMARY KEY(id))");
@@ -26,7 +24,7 @@ namespace BlazorLibrary.Data
 
         private static SQLiteConnection HoleConnnection()
         {
-            return new(sqliteConString);
+            return new($"Data Source={Path.Combine(Manager.MauiProgramActiveDirectory(), MauiProgram.Einstellungen.Sqlitedatabasename)}.sqlite;Version=3;");
         }
 
         private static void ExecuteQuery(string cmd)

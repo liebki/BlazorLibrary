@@ -1,10 +1,7 @@
 ﻿using System.Text;
 
-using Blazored.Modal.Services;
-
-using BlazorLibrary.Management;
 using BlazorLibrary.Modelle;
-using BlazorLibrary.Pages.Komponenten;
+using BlazorLibrary.Management;
 
 using Microsoft.AspNetCore.Components;
 
@@ -14,12 +11,6 @@ namespace BlazorLibrary.Pages
     {
         [Parameter]
         [SupplyParameterFromQuery]
-        public string Nachricht { get; set; } = string.Empty;
-
-        [CascadingParameter] public IModalService Modal { get; set; }
-
-        private void ShowModal() => Modal.Show<Confirm>(Nachricht);
-
         public string NeuesGenre { get; set; }
         public Genre editgenre { get; set; }
         public Genre[] GenreListe { get; set; }
@@ -44,10 +35,6 @@ namespace BlazorLibrary.Pages
         protected override async Task OnInitializedAsync()
         {
             await HoleDaten();
-            if (!String.IsNullOrEmpty(Nachricht))
-            {
-                ShowModal();
-            }
         }
 
         private Func<Genre, string> GenreIdToGenreName = g => g?.Name;
@@ -55,7 +42,7 @@ namespace BlazorLibrary.Pages
         public async Task AendereGenre()
         {
             await _db.RenameGenre(editgenre);
-            //navMan.NavigateTo($"/genreverwalten?Nachricht=You renamed a genre to {editgenre.Name}", true);
+            await Manager.MauiDialog("Information", $"You renamed the genre to {editgenre.Name}");
 
             await HoleDaten();
         }
@@ -65,7 +52,7 @@ namespace BlazorLibrary.Pages
             if (!(NeuesGenre.Length > 0 && string.IsNullOrWhiteSpace(NeuesGenre)))
             {
                 await _db.CreateGenreInDatabase(NeuesGenre, Manager.ActiveUser);
-                //navMan.NavigateTo($"/genreverwalten?Nachricht=You created the genre {NeuesGenre}", true);
+                await Manager.MauiDialog("Information", $"You created the genre {NeuesGenre}");
 
                 NeuesGenre = string.Empty;
                 await HoleDaten();

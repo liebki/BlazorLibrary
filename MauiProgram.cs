@@ -1,12 +1,10 @@
-﻿using Blazored.Modal;
-
-using BlazorLibrary.Data;
+﻿using BlazorLibrary.Data;
+using MudBlazor.Services;
 using BlazorLibrary.Management;
-using BlazorLibrary.Modelle.Application;
 
 using Microsoft.Extensions.Logging;
 
-using MudBlazor.Services;
+using BlazorLibrary.Modelle.Application;
 
 namespace BlazorLibrary
 {
@@ -29,7 +27,6 @@ namespace BlazorLibrary
 #endif
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddMudServices();
-            builder.Services.AddBlazoredModal();
 
             builder.Services.AddSingleton<SQLiteManager>();
 
@@ -40,9 +37,10 @@ namespace BlazorLibrary
             return builder.Build();
         }
 
-        private static void SetupLibrary()
+        public static void SetupLibrary()
         {
-            Einstellungen = Manager.ReadJsonSettingsFile(File.ReadAllText(Path.Combine(Manager.MauiProgramActiveDirectory(), "ApplicationSettingsFile.json")));
+            string EinstellungenJson = File.ReadAllText(Path.Combine(Manager.MauiProgramActiveDirectory(), "ApplicationSettingsFile.json"));
+            Einstellungen = Manager.ReadJsonSettingsFile(EinstellungenJson);
 
             if (Einstellungen is not null)
             {

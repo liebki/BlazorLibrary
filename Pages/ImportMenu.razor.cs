@@ -1,28 +1,10 @@
-﻿using Blazored.Modal.Services;
-
-using BlazorLibrary.Management;
+﻿using BlazorLibrary.Management;
 using BlazorLibrary.Modelle.Csv;
-using BlazorLibrary.Pages.Komponenten;
-
-using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages
 {
     partial class ImportMenu
     {
-        [Parameter]
-        [SupplyParameterFromQuery]
-        public string Nachricht { get; set; } = string.Empty;
-
-        [CascadingParameter] public IModalService Modal { get; set; }
-
-        private void test()
-        {
-            navMan.NavigateTo("/uhawd", true);
-        }
-
-        private void ShowModal() => Modal.Show<Confirm>(Nachricht);
-
         public StreamReader spielcsv { get; set; } = null;
         public string spielcsv_state { get; set; } = "Nothing";
         public StreamReader genrecsv { get; set; } = null;
@@ -30,10 +12,6 @@ namespace BlazorLibrary.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (!String.IsNullOrEmpty(Nachricht))
-            {
-                ShowModal();
-            }
         }
 
         public async Task VerarbeiteDaten()
@@ -65,11 +43,11 @@ namespace BlazorLibrary.Pages
 
             if (importiert)
             {
-                navMan.NavigateTo("/import?Nachricht=You imported data!", true);
+                await Manager.MauiDialog("Information", "You imported data!");
             }
             else
             {
-                navMan.NavigateTo("/import?Nachricht=You didn't import data!", true);
+                await Manager.MauiDialog("Information", "You didn't import data!");
             }
         }
 

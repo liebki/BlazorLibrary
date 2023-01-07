@@ -1,5 +1,5 @@
-﻿using BlazorLibrary.Management;
-using BlazorLibrary.Modelle;
+﻿using BlazorLibrary.Modelle;
+using BlazorLibrary.Management;
 
 using Microsoft.AspNetCore.Components;
 
@@ -38,7 +38,9 @@ namespace BlazorLibrary.Pages
             await _db.RemoveAllGenreOfGame(Spiel.Id);
 
             await _db.SaveGenreOfGame(Spiel.Id, AuswahlGenre);
-            navMan.NavigateTo($"/?Nachricht=You edited the game {Spiel.Name}", true);
+            navMan.NavigateTo("/games", true);
+
+            await Manager.MauiDialog("Information", $"You edited the game {Spiel.Name}");
         }
 
         private async Task HoleDaten()

@@ -1,5 +1,5 @@
-﻿using Blazored.Modal;
-using Blazored.Modal.Services;
+﻿
+using MudBlazor;
 
 using BlazorLibrary.Modelle;
 
@@ -11,12 +11,19 @@ namespace BlazorLibrary.Pages.Komponenten
     {
         private string berwertungGrund { get; set; } = string.Empty;
         private Bewertung sterneBewertung { get; set; } = new(0, string.Empty);
-        [CascadingParameter] private BlazoredModalInstance BlazoredModal { get; set; }
 
-        private async Task FormBeenden()
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+        private void Cancel()
+        {
+            MudDialog.Cancel();
+        }
+
+        private void GiveReview()
         {
             sterneBewertung = new(sterneBewertung.Sterneanzahl, berwertungGrund);
-            await BlazoredModal.CloseAsync(ModalResult.Ok(sterneBewertung));
+            MudDialog.Close(DialogResult.Ok(sterneBewertung));
         }
+
     }
 }

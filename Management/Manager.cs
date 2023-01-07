@@ -1,17 +1,16 @@
-﻿using System.Diagnostics;
-
-using System.Net.NetworkInformation;
+﻿using System.Text;
+using RawgNET.Models;
+using Newtonsoft.Json;
 using System.Reflection;
-using System.Text;
 
+using System.Diagnostics;
 using BlazorLibrary.Data;
 using BlazorLibrary.Modelle;
-using BlazorLibrary.Modelle.Application;
 using BlazorLibrary.Modelle.Nutzer;
 
-using Newtonsoft.Json;
+using System.Net.NetworkInformation;
 
-using RawgNET.Models;
+using BlazorLibrary.Modelle.Application;
 
 namespace BlazorLibrary.Management
 {
@@ -145,7 +144,6 @@ namespace BlazorLibrary.Management
 
         public static void KartenFilterungAnzeige(ref int modus, ref int filterungsfolge, ref List<Spiel> SpieleListe, ref List<Spiel> OriginaleListe)
         {
-            //Broken?
             if (modus == 0)
             {
                 SpieleListe = OriginaleListe;
@@ -317,33 +315,26 @@ namespace BlazorLibrary.Management
             return JsonConvert.DeserializeObject<ApplicationSettings>(json);
         }
 
-        public static string CreateModalId(string inp)
+        public static string GetSettingsAsJson(ApplicationSettings settings)
         {
-            string value = inp;
-            value = value.ToLower();
-
-            value = String.Concat(value.Split(default(string[]), StringSplitOptions.RemoveEmptyEntries));
-            char[] charArray = value.ToCharArray();
-
-            Array.Reverse(charArray);
-            return new string(charArray);
+            return JsonConvert.SerializeObject(settings, Formatting.Indented);
         }
 
         public static void StartExe(string exepfad)
         {
-            ProcessStartInfo startInfo = new();
-            startInfo.CreateNoWindow = true;
-
-            startInfo.WorkingDirectory = $"C:\\users\\{Environment.UserName}\\Desktop\\";
-            startInfo.UseShellExecute = true;
-
-            startInfo.FileName = exepfad;
-            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-
-            using (Process process = Process.Start(startInfo))
+            ProcessStartInfo startInfo = new()
             {
-                process.Start();
-            }
+                CreateNoWindow = true,
+
+                WorkingDirectory = $"C:\\users\\{Environment.UserName}\\Desktop\\",
+                UseShellExecute = true,
+
+                FileName = exepfad,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+
+            using Process process = Process.Start(startInfo);
+            process.Start();
         }
     }
 }

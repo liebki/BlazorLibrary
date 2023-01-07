@@ -25,9 +25,6 @@ namespace BlazorLibrary.Pages
             navMan.NavigateTo("/anzeige", true);
         }
 
-        /// <summary>
-        /// Wirklich simpler und schmutziger Weg, um das Bild zu drucken..ohne Dialog
-        /// </summary>
         public async Task DruckeSpiel()
         {
             if (ImageBase64Data?.Length > 0 && ImageBase64Data != string.Empty)

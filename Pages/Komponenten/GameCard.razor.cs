@@ -1,5 +1,5 @@
-﻿using Blazored.Modal;
-using Blazored.Modal.Services;
+﻿
+using MudBlazor;
 
 using BlazorLibrary.Modelle;
 
@@ -12,8 +12,8 @@ namespace BlazorLibrary.Pages.Komponenten
         [Parameter]
         public Spiel SpielKarte { get; set; }
 
-        [CascadingParameter] public IModalService Modal { get; set; }
-        private Bewertung bewertung;
+        [Inject]
+        private IDialogService DialogService { get; set; }
 
         private async Task SpielLoeschen()
         {
@@ -35,17 +35,19 @@ namespace BlazorLibrary.Pages.Komponenten
             StateHasChanged();
         }
 
+
+
         private async Task ShowModal()
         {
-            IModalReference messageForm = Modal.Show<Bewerten>("Give a review");
-            ModalResult result = await messageForm.Result;
+            IDialogReference dialog = await DialogService.ShowAsync<Bewerten>("Review the game");
+            DialogResult result = await dialog.Result;
 
-            if (!result.Cancelled)
+            if (!result.Canceled)
             {
-                bewertung = (Bewertung)result.Data;
-                SpielKarte.Sterne = bewertung.Sterneanzahl;
+                Bewertung spieleBewertung = (Bewertung)result.Data;
+                SpielKarte.Sterne = spieleBewertung.Sterneanzahl;
 
-                SpielKarte.SterneTooltip = bewertung.Grund;
+                SpielKarte.SterneTooltip = spieleBewertung.Grund;
                 await _db.UpdateSterneForGame(SpielKarte);
 
                 StateHasChanged();
