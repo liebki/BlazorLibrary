@@ -50,10 +50,19 @@ namespace BlazorLibrary.Pages
 
         public async Task HoleSpiele()
         {
-            SpieleListe.Clear();
+            if (SpieleListe.Count > 0)
+            {
+                SpieleListe.Clear();
+                StateHasChanged();
+            }
+
             SpieleListe = await _db.SpieleListeErhalten(Manager.ActiveUser);
 
-            StateHasChanged();
+            if(SpieleListe.Count > 0)
+            {
+                StateHasChanged();
+            }
+
         }
     }
 }

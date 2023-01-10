@@ -1,4 +1,5 @@
-﻿namespace BlazorLibrary.WinUI;
+﻿
+namespace BlazorLibrary.WinUI;
 
 public partial class App : MauiWinUIApplication
 {

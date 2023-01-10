@@ -2,16 +2,13 @@
 @inject NavigationManager navMan
 @inject IJSRuntime jsMan
 
-<MudCard Elevation="3" Class="mx-2" Style="min-width: 18rem; max-width:22%">
+<MudCard Elevation="4" Class="mx-2" Style="min-width: 18rem; max-width:22%">
     <MudCardHeader>
         <CardHeaderAvatar>
-
-            <!-- Wenn kommentiert, dann hat MudAvatar ein ChatBUbble Icon und sonst nicht-->
-            @*@if(SpielKarte.Fav == 1)
+            @if(SpielKarte.Kommentar.Commented)
             {
                 <MudAvatar Elevation=1 Color="Color.Success"><MudIcon Icon="@Icons.Material.Filled.MarkChatRead" /></MudAvatar>
-            }*@
-
+            }
         </CardHeaderAvatar>
 
         <CardHeaderContent>
@@ -71,8 +68,8 @@
         {
             <MudIconButton OnClick="@(() => FavoritSetzen(true))" Icon="@Icons.Material.Filled.ThumbUp" Color="Color.Surface" />
         }          
-        <MudIconButton OnClick="ShowModal" Icon="@Icons.Material.Filled.Star" Color="Color.Warning" />
-        <MudIconButton Icon="@Icons.Material.Filled.ChatBubbleOutline" Color="Color.Primary" />
+        <MudIconButton OnClick="ShowBewertenModal" Icon="@Icons.Material.Filled.Star" Color="Color.Warning" />
+        <MudIconButton OnClick="ShowKommentarModal" Icon="@Icons.Material.Filled.ChatBubbleOutline" Color="Color.Primary" />
     </MudCardActions>
 
 </MudCard>

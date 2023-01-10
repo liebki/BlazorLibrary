@@ -4,24 +4,24 @@
 
 <div>
     <MudText Typo="Typo.h4">BlazorLibrary Settings</MudText>
+    
+    <MudTextField @bind-Value="EinstellungenBackup.Sqlitedatabasename" Class="mt-3" Placeholder="What should the database be called?" T="string" Label="Database name" />
 
     <MudTextField @bind-Value="EinstellungenBackup.Rawgapikey" InputType="ShowHideState" Placeholder="The Key for the Rawg API" T="string" Label="Rawg Api-Key" />
 
-    <MudTextField @bind-Value="EinstellungenBackup.Sqlitedatabasename" Class="mt-3" Placeholder="What should the database be called?" T="string" Label="Database name" />
-
-    <MudCheckBox @bind-Checked="EinstellungenBackup.Userawg" Class="mt-3" Label="Should the Rawg API be used or not?" T="bool" />
-
-    <MudTextField @bind-Value="EinstellungenBackup.Pricescraperuseragent" Class="mt-3" Placeholder="The Useragent, that is used to query the price" T="string" Label="Useragent for pricescraping" />
-
-    <MudCheckBox @bind-Checked="EinstellungenBackup.Usepricescraper" Class="mt-3" Label="Should the price scraper be used or not?" T="bool" />
-</div>
-
-<div>
     <MudForm>
         <MudButton Class="mt-2" OnClick="ShowHideApiKey" Variant="Variant.Filled" Color="ShowHideButtonColor">@ShowHideButtonText</MudButton>
         <MudButton Class="mt-2" Href="https://rawg.io/apidocs" Variant="Variant.Filled" Color="Color.Info">Get Api-Key</MudButton>
     </MudForm>
+    
+    <MudCheckBox Dense @bind-Checked="EinstellungenBackup.Userawg" Class="mt-3" Label="Should the Rawg API be used or not?" T="bool" />
+
+    <MudTextField @bind-Value="EinstellungenBackup.Pricescraperuseragent" Class="mt-3" Placeholder="The Useragent, that is used to query the price" T="string" Label="Useragent for pricescraping" />
+
+    <MudCheckBox Dense @bind-Checked="EinstellungenBackup.Usepricescraper" Class="mt-3" Label="Should the price scraper be used or not?" T="bool" />
 </div>
+
+<MudDivider />
 
 <div>
     <MudButton OnClick="SaveSettingsToFile" Class="mt-2" Variant="Variant.Filled" Color="Color.Success">Save settings</MudButton>

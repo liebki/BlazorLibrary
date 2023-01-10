@@ -6,9 +6,9 @@ namespace BlazorLibrary.Pages
     partial class ImportMenu
     {
         public StreamReader spielcsv { get; set; } = null;
-        public string spielcsv_state { get; set; } = "Nothing";
+        public string spielcsv_state { get; set; } = "Nothing loaded yet";
         public StreamReader genrecsv { get; set; } = null;
-        public string genrecsv_state { get; set; } = "Nothing";
+        public string genrecsv_state { get; set; } = "Nothing loaded yet";
 
         protected override async Task OnInitializedAsync()
         {
@@ -24,7 +24,7 @@ namespace BlazorLibrary.Pages
 
                 if (CsvSpieleListe.Count > 0)
                 {
-                    await _db.CsvInsertSpieleInDatabase(CsvSpieleListe, Manager.ActiveUser);
+                    await _db.CsvInsertInDatabase((dynamic)CsvSpieleListe, Manager.ActiveUser);
                 }
                 importiert = true;
             }
@@ -36,7 +36,7 @@ namespace BlazorLibrary.Pages
 
                 if (CsvGenreListe.Count > 0)
                 {
-                    await _db.CsvInsertGenreInDatabase(CsvGenreListe, Manager.ActiveUser);
+                    await _db.CsvInsertInDatabase((dynamic)CsvGenreListe, Manager.ActiveUser);
                 }
                 importiert = true;
             }

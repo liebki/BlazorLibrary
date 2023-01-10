@@ -2,7 +2,7 @@
 {
     public class Spiel
     {
-        public Spiel(int id, int owner = 0, string name = "", string beschreibung = "", string bildlink = "", string exepfad = "", string sternetooltip = "", int fav = 0, int sterne = 0, int papierkorb = 0, string metacritics = "", string estimatedprice = "", Genre[] genrelist = null)
+        public Spiel(int id, int owner = 0, string name = "", string beschreibung = "", string bildlink = "", string exepfad = "", string sternetooltip = "", int fav = 0, int sterne = 0, int papierkorb = 0, string metacritics = "", string estimatedprice = "", (string Text, bool Commented, int Id) kommentar = new(), Genre[] genrelist = null)
         {
             this.Id = id;
             this.Owner = owner;
@@ -16,6 +16,7 @@
             this.Papierkorb = papierkorb;
             this.Metacritics = metacritics;
             this.Estimatedprice = estimatedprice;
+            this.Kommentar = kommentar;
             this.Genrelist = genrelist;
         }
 
@@ -31,11 +32,8 @@
         public int Papierkorb { get; set; }
         public string Metacritics { get; set; }
         public string Estimatedprice { get; set; }
+        public (string Text, bool Commented, int Id) Kommentar { get; set; }
         public Genre[] Genrelist { get; set; }
 
-        public override string ToString()
-        {
-            return $"{{{nameof(Id)}={Id.ToString()}, {nameof(Owner)}={Owner.ToString()}, {nameof(Name)}={Name}, {nameof(Beschreibung)}={Beschreibung}, {nameof(Bildlink)}={Bildlink}, {nameof(Exepfad)}={Exepfad}, {nameof(SterneTooltip)}={SterneTooltip}, {nameof(Fav)}={Fav.ToString()}, {nameof(Sterne)}={Sterne.ToString()}, {nameof(Papierkorb)}={Papierkorb.ToString()}, {nameof(Metacritics)}={Metacritics}, {nameof(Estimatedprice)}={Estimatedprice}, {nameof(Genrelist)}={Genrelist}}}";
-        }
     }
 }

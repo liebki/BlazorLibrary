@@ -4,6 +4,7 @@ using MudBlazor;
 using BlazorLibrary.Modelle;
 
 using Microsoft.AspNetCore.Components;
+using System.ComponentModel.Design;
 
 namespace BlazorLibrary.Pages.Komponenten
 {
@@ -35,9 +36,44 @@ namespace BlazorLibrary.Pages.Komponenten
             StateHasChanged();
         }
 
+        private async Task ShowKommentarModal()
+        {
+            DialogParameters kommentarTextPara = new()
+            {
+                { "CommentText", SpielKarte.Kommentar.Text }
+            };
 
+            IDialogReference dialog = await DialogService.ShowAsync<KommentarDialog>("Comment the game", kommentarTextPara);
+            DialogResult result = await dialog.Result;
 
-        private async Task ShowModal()
+            if (!result.Canceled)
+            {
+                (string Text, bool ToDelete) Comment = ((string, bool))result.Data;
+                if(!SpielKarte.Kommentar.Commented)
+                {
+                    int CommentId = await _db.SaveSpielComment(SpielKarte.Id, Comment.Text);
+                    SpielKarte.Kommentar = (Comment.Text, true, CommentId);
+                } 
+                else
+                {
+                    if(Comment.ToDelete)
+                    {
+                        await _db.DeleteComment(SpielKarte.Id, SpielKarte.Kommentar.Id);
+                        SpielKarte.Kommentar = ("", false, 0);
+                    } else
+                    {
+                        (string Text, bool Gesetzt, int Id) NewComment = (Comment.Text, SpielKarte.Kommentar.Commented, SpielKarte.Kommentar.Id);
+
+                        await _db.UpdateComment(NewComment);
+                        SpielKarte.Kommentar = NewComment;
+                    }
+
+                }
+                StateHasChanged();
+            }
+        }
+
+        private async Task ShowBewertenModal()
         {
             IDialogReference dialog = await DialogService.ShowAsync<Bewerten>("Review the game");
             DialogResult result = await dialog.Result;

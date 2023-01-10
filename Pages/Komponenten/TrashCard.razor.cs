@@ -20,6 +20,7 @@ namespace BlazorLibrary.Pages.Komponenten
             await _db.RemoveAllGenreOfGame(SpielKarte.Id);
             await _db.DeleteSpielCompletely(SpielKarte);
 
+            await _db.DeleteComment(SpielKarte.Id, SpielKarte.Kommentar.Id);
             navMan.NavigateTo("/games", true);
         }
     }

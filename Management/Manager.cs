@@ -122,18 +122,7 @@ namespace BlazorLibrary.Management
             return (beschreibung, exepfad);
         }
 
-        public static int RandomGenreNummer()
-        {
-            int randomNum = RandomSpielNummer();
-            int randomNum2 = RandomSpielNummer();
-
-            int randomNum3 = RandomSpielNummer();
-            int nummer = randomNum + ((randomNum2 / 4) + (randomNum3 / 2));
-
-            return nummer;
-        }
-
-        public static int RandomSpielNummer()
+        public static int RandomIdNumber()
         {
             int number = new Random().Next(1, 999);
             int number2 = new Random(number).Next(1, 999);
