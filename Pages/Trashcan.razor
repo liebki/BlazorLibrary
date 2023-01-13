@@ -1,0 +1,18 @@
+@page "/trashcan"
+
+<LoginCheck/>
+
+<MudText Typo="Typo.h4">Library Trashcan</MudText>
+
+@if (Gamelist.Count <= 0)
+{
+    <MudText Color="Color.Error" Class="mt-2 mb-2">Error: There are no games in the trashcan...</MudText>
+} else
+{
+    <div class="card-group mt-1">
+    @foreach(LibraryGame sp in Gamelist)
+    {
+        <TrashCard GameOfCard="sp" /> 
+    }
+</div>
+}

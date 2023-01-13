@@ -7,28 +7,28 @@ A library for games, created using .NET Core 7.0 with MAUI (Blazor)!
 - MAUI (Blazor) on .NET Core 7.0
 
 ### Nuget(s)
-- Microsoft.Windows.SDK.BuildTools
+- CsvHelper
+- HtmlAgilityPack
 - Microsoft.AspNetCore.Components.WebView.Maui
-- Microsoft.Extensions.DependencyInjection   
-- HtmlAgilityPack   
-- System.Data.SQLite 
-- Microsoft.Extensions.Logging
-- CsvHelper   
-- Microsoft.Extensions.Logging.Abstractions     
-- Newtonsoft.Json 
-- Microsoft.WindowsAppSDK     
-- Microsoft.Maui.Graphics.Win2D.WinUI.Desktop  
-- Microsoft.Maui.Graphics   
-- Microsoft.Extensions.Logging.Debug 
 - Microsoft.Extensions.Configuration
-- https://html2canvas.hertzen.com
-    - To use the print feature, nothing else is working besides some old JavaScript
-- [MudBlazor](https://github.com/MudBlazor/MudBlazor)!
-    - For the new design, simply everything from buttons to select's
-- [RawgNet](https://github.com/liebki/RawgNET)
-    - Where the game data comes from
+- Microsoft.Extensions.DependencyInjection
+- Microsoft.Extensions.Logging
+- Microsoft.Extensions.Logging.Abstractions
+- Microsoft.Extensions.Logging.Debug
+- Microsoft.Maui.Graphics
+- Microsoft.Maui.Graphics.Win2D.WinUI.Desktop
+- Microsoft.Windows.SDK.BuildTools
+- Microsoft.WindowsAppSDK
 - [MmogaNet is coming](https://github.com/liebki/MMOGANet)
     - Pricing (If game is found)
+- [MudBlazor](https://github.com/MudBlazor/MudBlazor)!
+    - For the new design, simply everything from buttons to select's
+- Newtonsoft.Json
+- [RawgNet](https://github.com/liebki/RawgNET)
+    - Where the game data comes from
+- System.Data.SQLite
+- [Html2Canvas JS](https://html2canvas.hertzen.com) (removed until I decide how to implement the print thing)
+    - To use the print feature, nothing else is working besides some old JavaScript
 
 ## Features
 
@@ -102,8 +102,6 @@ You can apply (get a key) here: https://rawg.io/apidocs
 ## Roadmap
 
 - Internal cleaning and code reduction
-- Settings, to change various things (ApplicationSettingsFile.json)
-- Being able to comment, not the review like a bigger text to comment a game
 - Import data from various sources, like databases etc.
 - Better price querying [MmogaNet](https://github.com/liebki/MMOGANet)
 - Reintroduce the print feature but better

@@ -5,11 +5,11 @@ namespace BlazorLibrary
     partial class Main
     {
         [Inject]
-        private NavigationManager NavMan { get; set; }
+        private NavigationManager NavigationMan { get; set; }
 
         protected void BackToStart()
         {
-            NavMan.NavigateTo("/", true);
+            NavigationMan.NavigateTo("/", true);
         }
     }
 }

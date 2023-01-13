@@ -82,17 +82,3 @@ a, .btn-link {
         padding-left: env(safe-area-inset-left);
     }
 }
-
-.druckBildGroesse {
-    width: 100%;
-    max-width: 500px;
-    height: auto;
-}
-
-.card {
-    overflow: hidden;
-}
-
-.card-text {
-    word-wrap: break-word;
-}

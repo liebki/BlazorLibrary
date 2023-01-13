@@ -3,14 +3,13 @@ using MudBlazor.Services;
 using BlazorLibrary.Management;
 
 using Microsoft.Extensions.Logging;
-
-using BlazorLibrary.Modelle.Application;
+using BlazorLibrary.Models.Application;
 
 namespace BlazorLibrary
 {
     public static class MauiProgram
     {
-        public static ApplicationSettings Einstellungen { get; set; } = new();
+        public static ApplicationSettings Settings { get; set; } = new();
 
         public static MauiApp CreateMauiApp()
         {
@@ -28,28 +27,33 @@ namespace BlazorLibrary
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddMudServices();
 
-            builder.Services.AddSingleton<SQLiteManager>();
-
-            builder.Services.AddSingleton<CsvManager>();
-            builder.Services.AddSingleton<RawgNetManager>();
-
+            AddCustomManagers(builder);
             SetupLibrary();
+
             return builder.Build();
+        }
+
+        private static void AddCustomManagers(MauiAppBuilder builder)
+        {
+            builder.Services.AddSingleton<SqliteDatabaseManager>();
+            builder.Services.AddSingleton<CsvManager>();
+
+            builder.Services.AddSingleton<RawgNetManager>();
         }
 
         public static void SetupLibrary()
         {
-            string EinstellungenJson = File.ReadAllText(Path.Combine(Manager.MauiProgramActiveDirectory(), "ApplicationSettingsFile.json"));
-            Einstellungen = Manager.ReadJsonSettingsFile(EinstellungenJson);
+            string SettingsAsJson = File.ReadAllText(Path.Combine(Manager.GetExecutionDirectory(), "ApplicationSettingsFile.json"));
+            Settings = Manager.JsonToObject<ApplicationSettings>(SettingsAsJson);
 
-            if (Einstellungen is not null)
+            if (Settings is not null)
             {
-                if (!Manager.InternetAvailable() || Einstellungen.Rawgapikey.Length < 10)
+                if (!Manager.IsInternetAvailable() || Settings.RawgApikey.Length < 10)
                 {
-                    Einstellungen.Usepricescraper = false;
-                    Einstellungen.Userawg = false;
+                    Settings.UsePriceScraper = false;
+                    Settings.UseRawg = false;
                 }
-                SQLiteManager.SetupDatabase();
+                SqliteDatabaseManager.SetupDatabase();
             }
         }
     }

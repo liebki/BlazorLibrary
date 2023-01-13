@@ -8,7 +8,7 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <MudList Style="color:white;">
 
-        @if (Manager.ActiveUser != null) {
+        @if (Manager.ActiveLibraryUser != null) {
             <MudListItem Class="px-3">
                 <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.SettingsApplications" Href="settings" Match="NavLinkMatch.All">Settings</MudNavLink>
             </MudListItem>
@@ -18,7 +18,7 @@
             <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.Home" Href="" Match="NavLinkMatch.All">Start</MudNavLink>
         </MudListItem>
 
-        @if(Manager.ActiveUser != null)
+        @if(Manager.ActiveLibraryUser != null)
         {
             <MudListItem Class="px-3">
                 <MudNavLink IconColor="Color.Primary" Icon="@Icons.Material.Filled.Folder" Href="games" Match="NavLinkMatch.All">Library</MudNavLink>

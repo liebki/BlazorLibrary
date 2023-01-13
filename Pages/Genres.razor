@@ -1,0 +1,36 @@
+@page "/genres"
+
+<LoginCheck />
+
+<MudText Typo="Typo.h4">Manage the library genre</MudText>
+
+@if(AvailableGenres.Length > 0)
+{
+    <div class="mt-1">
+        <MudSelect Placeholder="Here are the existing genre listed" T="LibraryGenre" ToStringFunc="GenreIdToGenreName" MultiSelection="true" @bind-SelectedValues="SelectedGenres" >
+            @foreach (LibraryGenre gr in AvailableGenres)
+            {
+                <MudSelectItem Value="@gr">@gr.Name</MudSelectItem>
+            }
+        </MudSelect>
+    </div>
+
+    @if (SelectedGenres.Count() >= 1)
+    {
+        <MudButton Class="mt-3" OnClick="DeleteGenres" Variant="Variant.Filled" Color="Color.Error" >Delete selection</MudButton>
+    }
+
+    @if (SelectedGenres.Count() == 1)
+    {
+        <MudTextField MaxLength="50" @bind-Value="GenreToUpdate.Name" id="genreaendernfeld" Placeholder="New genre name" />
+        <MudButton Class="mt-3" OnClick="UpdateGenre" Variant="Variant.Filled" Color="Color.Info">Edit genre</MudButton>
+    }
+} else
+{
+    <MudText Color="Color.Error" Class="pt-2">Error: There are no genre, add some genre to use them here...</MudText>
+}
+
+<div>
+    <MudTextField MaxLength="50" @bind-Value="NewGenreName" id="genreerstellfeld" Placeholder="How the new genre should be called" />
+    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="CreateGenre" Class="mt-3">Create new genre</MudButton>
+</div>

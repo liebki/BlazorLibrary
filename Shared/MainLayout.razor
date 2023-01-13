@@ -1,9 +1,17 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    @if(MauiProgram.Settings.UseColoredNavMenu)
+    {
+        <div class="navmenusettings sidebar">
+            <NavMenu />
+        </div>
+    } else
+    {
+        <div style="background-color: @MauiProgram.Settings.CustomColorCode;" class="navmenusettings extra">
+            <NavMenu />
+        </div>
+    }
 
     <div class="main">
         <div class="top-row px-3">

@@ -1,11 +1,8 @@
-﻿
-using CsvHelper;
-
+﻿using CsvHelper;
 using System.Globalization;
-
 using CsvHelper.Configuration;
 
-using BlazorLibrary.Modelle.Csv;
+using BlazorLibrary.Models.Csv;
 
 namespace BlazorLibrary.Data
 {
@@ -13,27 +10,27 @@ namespace BlazorLibrary.Data
     {
         public List<object> CsvStreamReaderToObjects<T>(StreamReader CsvDateiInhalt)
         {
-            List<object> RetList = new();
+            List<object> ItemList = new();
 
             using (CsvReader csv = new(CsvDateiInhalt, GetConfiguration()))
             {
                 csv.Read();
                 csv.ReadHeader();
 
-                if (typeof(CsvSpiel).IsAssignableFrom(typeof(T)))
+                if (typeof(CsvGame).IsAssignableFrom(typeof(T)))
                 {
-                    ProcessCsvSpielEntries(RetList, csv);
+                    ProcessCsvGameEntries(ItemList, csv);
                 }
 
                 if (typeof(CsvGenre).IsAssignableFrom(typeof(T)))
                 {
-                    ProcessCsvGenreEntries(RetList, csv);
+                    ProcessCsvGenreEntries(ItemList, csv);
                 }
             }
-            return RetList;
+            return ItemList;
         }
 
-        private static void ProcessCsvGenreEntries(List<object> RetList, CsvReader csv)
+        private static void ProcessCsvGenreEntries(List<object> ItemList, CsvReader csv)
         {
             while (csv.Read())
             {
@@ -41,25 +38,25 @@ namespace BlazorLibrary.Data
                 if (!string.IsNullOrEmpty(Name) && !string.IsNullOrWhiteSpace(Name))
                 {
                     CsvGenre genre = new(Name);
-                    RetList.Add(genre);
+                    ItemList.Add(genre);
                 }
             }
         }
 
-        private static void ProcessCsvSpielEntries(List<object> RetList, CsvReader csv)
+        private static void ProcessCsvGameEntries(List<object> ItemList, CsvReader csv)
         {
             while (csv.Read())
             {
                 string Name = csv.GetField("Name");
                 if (!string.IsNullOrEmpty(Name) && !string.IsNullOrWhiteSpace(Name))
                 {
-                    string Beschreibung = csv.GetField("Beschreibung");
-                    string Bildlink = csv.GetField("Bildlink");
+                    string Description = csv.GetField("Beschreibung");
+                    string ImageUrl = csv.GetField("Bildlink");
 
-                    string Exepfad = csv.GetField("Exepfad");
-                    CsvSpiel spiel = new(Name, Beschreibung, Bildlink, Exepfad);
+                    string ExecutablePath = csv.GetField("Exepfad");
+                    CsvGame game = new(Name, Description, ImageUrl, ExecutablePath);
 
-                    RetList.Add(spiel);
+                    ItemList.Add(game);
                 }
             }
         }

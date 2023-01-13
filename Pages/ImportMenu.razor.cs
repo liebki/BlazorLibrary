@@ -1,75 +1,82 @@
-﻿using BlazorLibrary.Management;
-using BlazorLibrary.Modelle.Csv;
+﻿using BlazorLibrary.Data;
+using BlazorLibrary.Management;
+using BlazorLibrary.Models.Csv;
+
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages
 {
     partial class ImportMenu
     {
-        public StreamReader spielcsv { get; set; } = null;
-        public string spielcsv_state { get; set; } = "Nothing loaded yet";
-        public StreamReader genrecsv { get; set; } = null;
-        public string genrecsv_state { get; set; } = "Nothing loaded yet";
+        [Inject]
+        public SqliteDatabaseManager DatabaseMan { get; set; }
 
-        protected override async Task OnInitializedAsync()
-        {
-        }
+        [Inject]
+        public CsvManager CsvMan { get; set; }
+
+        public StreamReader GameCsvStream { get; set; } = null;
+        public string GameCsvPlaceholder { get; set; } = "Nothing loaded yet";
+        public StreamReader GenreCsvStream { get; set; } = null;
+        public string GenreCsvPlaceholder { get; set; } = "Nothing loaded yet";
 
         public async Task VerarbeiteDaten()
         {
-            bool importiert = false;
-            if (spielcsv?.BaseStream.Length > 0)
+            bool ImportedData = false;
+            if (GameCsvStream?.BaseStream.Length > 0)
             {
-                List<object> CsvImportSpiel = csvMan.CsvStreamReaderToObjects<CsvSpiel>(spielcsv);
-                List<CsvSpiel> CsvSpieleListe = CsvImportSpiel.Cast<CsvSpiel>().ToList();
+                List<object> CsvImportGamelist = CsvMan.CsvStreamReaderToObjects<CsvGame>(GameCsvStream);
+                List<CsvGame> CsvGamelist = CsvImportGamelist.Cast<CsvGame>().ToList();
 
-                if (CsvSpieleListe.Count > 0)
+                if (CsvGamelist.Count > 0)
                 {
-                    await _db.CsvInsertInDatabase((dynamic)CsvSpieleListe, Manager.ActiveUser);
+                    await DatabaseMan.InsertCsvEntries((dynamic)CsvGamelist, Manager.ActiveLibraryUser);
                 }
-                importiert = true;
+                ImportedData = true;
             }
 
-            if (genrecsv?.BaseStream.Length > 0)
+            if (GenreCsvStream?.BaseStream.Length > 0)
             {
-                List<object> CsvImportGenre = csvMan.CsvStreamReaderToObjects<CsvGenre>(genrecsv);
-                List<CsvGenre> CsvGenreListe = CsvImportGenre.Cast<CsvGenre>().ToList();
+                List<object> CsvImportGenrelist = CsvMan.CsvStreamReaderToObjects<CsvGenre>(GenreCsvStream);
+                List<CsvGenre> CsvGenreListe = CsvImportGenrelist.Cast<CsvGenre>().ToList();
 
                 if (CsvGenreListe.Count > 0)
                 {
-                    await _db.CsvInsertInDatabase((dynamic)CsvGenreListe, Manager.ActiveUser);
+                    await DatabaseMan.InsertCsvEntries((dynamic)CsvGenreListe, Manager.ActiveLibraryUser);
                 }
-                importiert = true;
+                ImportedData = true;
             }
 
-            if (importiert)
+            if (ImportedData)
             {
-                await Manager.MauiDialog("Information", "You imported data!");
+                await Manager.SimpleDialogMessage("Information", "You imported data!");
             }
             else
             {
-                await Manager.MauiDialog("Information", "You didn't import data!");
+                await Manager.SimpleDialogMessage("Information", "You didn't import data!");
             }
         }
 
         public async Task SelectImportCsv(ImportType sel)
         {
-            if (sel == ImportType.Spiel)
+            if (sel == ImportType.Game)
             {
-                StreamReader input = await Manager.ReadStreamFromFile();
+                StreamReader input = await Manager.GetStreamOfFile();
                 if (input?.BaseStream.Length > 0)
                 {
-                    spielcsv = input;
-                    spielcsv_state = "File selected, read and waiting for import.";
+                    GameCsvStream = input;
+                    GameCsvPlaceholder = "File selected, read and waiting for import.";
+
                     StateHasChanged();
                 }
             }
             else
             {
-                StreamReader input = await Manager.ReadStreamFromFile();
+                StreamReader input = await Manager.GetStreamOfFile();
                 if (input?.BaseStream.Length > 0)
                 {
-                    genrecsv = input;
-                    genrecsv_state = "File selected, read and waiting for import.";
+                    GenreCsvStream = input;
+                    GenreCsvPlaceholder = "File selected, read and waiting for import.";
+
                     StateHasChanged();
                 }
             }
@@ -78,7 +85,7 @@ namespace BlazorLibrary.Pages
 
     public enum ImportType
     {
-        Spiel = 0,
+        Game = 0,
         Genre = 1
     }
 }

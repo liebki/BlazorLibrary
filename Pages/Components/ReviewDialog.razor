@@ -1,0 +1,12 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudRating @bind-SelectedValue="ReviewToUse.Stars" Size="Size.Medium" />
+        <MudTextField @bind-Value="ReviewReasonText" InputType="InputType.Text" Label="Comment the review" />
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton Color="Color.Warning" Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="GiveReview">Give review</MudButton>
+    </DialogActions>
+
+</MudDialog>

@@ -1,0 +1,40 @@
+@page "/spielbearbeiten/{GameId}"
+
+<LoginCheck/>
+
+<MudText Typo="Typo.h4">Edit your game <small>"@GameToUpdate.Name"</small></MudText>
+
+<div class="mt-1">
+    <MudTextField Label="Name of the game" T="string" @bind-Value="GameToUpdate.Name" InputType="InputType.Text" />
+</div>
+
+<div class="mt-1">
+    <MudTextField Label="Description of the game" T="string" @bind-Value="GameToUpdate.Description" InputType="InputType.Text" />
+</div>
+
+<div class="mt-1">
+    <MudTextField Label="Url to image" T="string" @bind-Value="GameToUpdate.ImageUrl" InputType="InputType.Text" />
+</div>
+
+<div class="mt-1">
+    <MudTextField Label="Path to exe file" T="string" @bind-Value="GameToUpdate.ExecutablePath" InputType="InputType.Text" />
+    <MudButton Class="mt-2" OnClick="ExecutableDialog" Variant="Variant.Filled" Color="Color.Info" >Choose .exe file</MudButton>
+</div>
+
+@if(AvailableGenres.Length > 0)
+{
+    <MudSelect Placeholder="Change the genres for the game" ToStringFunc="GenreIdToGenreName" MultiSelection=true T="LibraryGenre" @bind-SelectedValues="GenresToAdd">
+        @foreach (LibraryGenre gr in AvailableGenres)
+        {
+            <MudSelectItem Value="@gr">@gr.Name</MudSelectItem>
+        }
+    </MudSelect>
+} else
+{
+    <MudText Color="Color.Error" Class="mt-2">Error: There are no genre, add some genre to use them here...</MudText>
+}
+
+<div class="mt-2">
+    <MudButton OnClick="SaveData" Variant="Variant.Filled" Color="Color.Success">Save</MudButton>
+    <MudButton Href="/games" Variant="Variant.Filled" Color="Color.Error">Back</MudButton>
+</div>

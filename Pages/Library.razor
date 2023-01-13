@@ -1,0 +1,35 @@
+@page "/games"
+
+<LoginCheck/>
+
+<MudText Typo="Typo.h4">Welcome to your library</MudText>
+
+@if (ActiveGamelist.Count <= 0)
+{
+    <MudText Color="Color.Error" Class="pt-2">Error: There are no games, add some games to use them here...</MudText>
+} else
+{
+    <div>
+        <MudSelect T="int" @bind-bind-Value="FilterMode">
+            <MudSelectItem Value="0" >Sort...</MudSelectItem>
+            <MudSelectItem Value="1" >Genre</MudSelectItem>
+            <MudSelectItem Value="2" >Genrecount</MudSelectItem>
+            <MudSelectItem Value="3" >Name</MudSelectItem>
+            <MudSelectItem Value="4" >Favourite</MudSelectItem>
+            <MudSelectItem Value="5" >Stars</MudSelectItem>
+        </MudSelect>
+
+        <MudSpacer />
+
+        <MudSelect T="int" @bind-bind-Value="FilterDirection">
+            <MudSelectItem Value="0">Ascending</MudSelectItem>
+            <MudSelectItem Value="1">Descending</MudSelectItem>
+        </MudSelect>
+    </div>
+<div class="card-group mt-3">
+    @foreach(LibraryGame sp in ActiveGamelist.Where(x => x.IsInTrash == 0))
+    {
+        <GameCard GameOfCard="@sp" />
+    }
+</div>
+}

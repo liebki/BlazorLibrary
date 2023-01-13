@@ -1,27 +1,40 @@
-﻿using System.Text;
+﻿
 using RawgNET.Models;
 using Newtonsoft.Json;
 using System.Reflection;
 
 using System.Diagnostics;
 using BlazorLibrary.Data;
-using BlazorLibrary.Modelle;
-using BlazorLibrary.Modelle.Nutzer;
+using BlazorLibrary.Models;
+
+using BlazorLibrary.Models.User;
 
 using System.Net.NetworkInformation;
-
-using BlazorLibrary.Modelle.Application;
 
 namespace BlazorLibrary.Management
 {
     public static class Manager
     {
-        public static LibraryUser ActiveUser { get; set; } = null;
-        private static readonly string[] BildFilterBegriffe = { ".png", ".jpg", ".gif" };
+        public static LibraryUser ActiveLibraryUser { get; set; } = null;
+        private static readonly string[] GameImageExtensionsFilter = { ".png", ".jpg", ".gif" };
+        private const string ImageNotFoundUrl = "https://sinatax.de/wp-content/themes/consultix/images/no-image-found-360x260.png";
 
-        public static bool DoesStringContainCharacters(string s)
+        public static async Task<(string, bool)> OpenSelectExecutableDialog()
         {
-            foreach (char c in s)
+            string ExecutablePath = string.Empty;
+            FileResult file = await Manager.PickExecutablePath();
+
+            if (file != null)
+            {
+                ExecutablePath = file.FullPath;
+                return (ExecutablePath, true);
+            }
+
+            return (ExecutablePath, false);
+        }
+        public static bool DoesStringContainCharacters(string Input)
+        {
+            foreach (char c in Input)
             {
                 if (!char.IsDigit(c))
                     return true;
@@ -29,12 +42,12 @@ namespace BlazorLibrary.Management
             return false;
         }
 
-        public static void ClearActiveUser()
+        public static void ClearActiveLibraryUser()
         {
-            ActiveUser = null;
+            ActiveLibraryUser = null;
         }
 
-        public static bool InternetAvailable()
+        public static bool IsInternetAvailable()
         {
             try
             {
@@ -53,204 +66,170 @@ namespace BlazorLibrary.Management
             }
         }
 
-        public static void SaveImage(Stream stream, string path)
+        public static void SaveImage(Stream DataStream, string Path)
         {
-            using FileStream fileStream = new(path, FileMode.Create, FileAccess.Write);
-            stream.CopyTo(fileStream);
+            using FileStream fileStream = new(Path, FileMode.Create, FileAccess.Write);
+            DataStream.CopyTo(fileStream);
         }
 
-        public static string MauiProgramActiveDirectory()
+        public static string GetExecutionDirectory()
         {
-            string strExeFilePath = Assembly.GetExecutingAssembly().Location;
-            string strWorkPath = Path.GetDirectoryName(strExeFilePath);
+            string WholeAssemblyPath = Assembly.GetExecutingAssembly().Location;
+            string AssemblyDirectoryPath = Path.GetDirectoryName(WholeAssemblyPath);
 
-            return strWorkPath;
+            return AssemblyDirectoryPath;
         }
 
-        public static async Task<(string, string, string)> AddExternalSource(string name, string bildurl = "")
+        public static async Task<(string, string, string)> AddExternalGamecardSources(string name, string imageurl = "")
         {
-            string bild = bildurl, metacritic = "∅", estimatedprice = "∅";
+            string ImageUrl = imageurl, Metacritic = "∅", RoughPrice = "∅";
 
-            if (MauiProgram.Einstellungen.Usepricescraper)
+            if (MauiProgram.Settings.UsePriceScraper)
             {
-                string price = MmogaPriceScraper.GetPreisVonSpiel(name);
-                if (!string.IsNullOrEmpty(price) && !string.IsNullOrWhiteSpace(price))
+                string Price = PriceScraperManager.GetRoughPriceOfGame(name);
+                if (!string.IsNullOrEmpty(Price) && !string.IsNullOrWhiteSpace(Price))
                 {
-                    estimatedprice = price;
+                    RoughPrice = Price;
                 }
             }
 
-            if (MauiProgram.Einstellungen.Userawg)
+            if (MauiProgram.Settings.UseRawg)
             {
-                Game RawgGame = await RawgNetManager.GetGameByName(name, MauiProgram.Einstellungen.Rawgapikey, true, true);
-                if (RawgGame != null && RawgGame.Id != null)
+                Game GameRawgQuery = await RawgNetManager.GetGameByName(name, MauiProgram.Settings.RawgApikey, true, true);
+                if (GameRawgQuery != null && GameRawgQuery.Id != null)
                 {
-                    metacritic = Convert.ToString(RawgGame.Metacritic);
-                    if (string.IsNullOrEmpty(bild) || string.IsNullOrWhiteSpace(bild) || !BildFilterBegriffe.Any(bild.Contains))
+                    Metacritic = Convert.ToString(GameRawgQuery.Metacritic);
+                    if (string.IsNullOrEmpty(ImageUrl) || string.IsNullOrWhiteSpace(ImageUrl) || !GameImageExtensionsFilter.Any(ImageUrl.Contains))
                     {
-                        bild = RawgGame.BackgroundImage.ToString();
+                        ImageUrl = GameRawgQuery.BackgroundImage.ToString();
                     }
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(bild) || string.IsNullOrWhiteSpace(bild) || !BildFilterBegriffe.Any(bild.Contains))
+                    if (string.IsNullOrEmpty(ImageUrl) || string.IsNullOrWhiteSpace(ImageUrl) || !GameImageExtensionsFilter.Any(ImageUrl.Contains))
                     {
-                        bild = "https://sinatax.de/wp-content/themes/consultix/images/no-image-found-360x260.png";
+                        ImageUrl = ImageNotFoundUrl;
                     }
                 }
             }
             else
             {
-                if (string.IsNullOrEmpty(bild) || string.IsNullOrWhiteSpace(bild) || !BildFilterBegriffe.Any(bild.Contains))
+                if (string.IsNullOrEmpty(ImageUrl) || string.IsNullOrWhiteSpace(ImageUrl) || !GameImageExtensionsFilter.Any(ImageUrl.Contains))
                 {
-                    bild = "https://sinatax.de/wp-content/themes/consultix/images/no-image-found-360x260.png";
+                    ImageUrl = ImageNotFoundUrl;
                 }
             }
-            return (bild, metacritic, estimatedprice);
+            return (ImageUrl, Metacritic, RoughPrice);
         }
 
-        public static (string, string) RemoveNullValues(string beschreibung, string exepfad)
+        public static (string, string) ToBeSureRemoveNullValues(string Description, string ExecutablePath)
         {
-            if (string.IsNullOrEmpty(beschreibung))
+            if (string.IsNullOrEmpty(Description))
             {
-                beschreibung = string.Empty;
+                Description = string.Empty;
             }
-            if (string.IsNullOrEmpty(exepfad))
+            if (string.IsNullOrEmpty(ExecutablePath))
             {
-                exepfad = string.Empty;
+                ExecutablePath = string.Empty;
             }
-            return (beschreibung, exepfad);
+            return (Description, ExecutablePath);
         }
 
-        public static int RandomIdNumber()
+        public static int RandomNumber()
         {
-            int number = new Random().Next(1, 999);
-            int number2 = new Random(number).Next(1, 999);
+            int x = new Random().Next(1, 999);
+            int y = new Random(new Random().Next(1, 999)).Next(1, 999);
 
-            int random = number + (number2 / 2);
-            return random;
+            int z = x + (y / 2);
+            return z;
         }
 
-        public static void KartenFilterungAnzeige(ref int modus, ref int filterungsfolge, ref List<Spiel> SpieleListe, ref List<Spiel> OriginaleListe)
+        /// <summary>
+        /// Has to be WAY more simple and maybe in Library.razor.cs
+        /// </summary>
+        public static void GamecardFilter(ref int FilterMode, ref int FilterDirection, ref List<LibraryGame> ShownGamelist, ref List<Models.LibraryGame> OriginalGamelist)
         {
-            if (modus == 0)
+            if (FilterMode == 0)
             {
-                SpieleListe = OriginaleListe;
+                ShownGamelist = OriginalGamelist;
             }
-            else if (modus == 1)
+            else if (FilterMode == 1)
             {
-                if (filterungsfolge == 0)
+                if (FilterDirection == 0)
                 {
-                    SpieleListe = SpieleListe.Where(x => Manager.GenreArrayToStringArray(x.Genrelist).Length >= 1).OrderBy(x => Manager.GenreArrayToStringArray(x.Genrelist)[0]).ToList();
+                    ShownGamelist = ShownGamelist.Where(x => Manager.GenreArrayToString(x.ListOfGenres).Length >= 1).OrderBy(x => Manager.GenreArrayToString(x.ListOfGenres)[0]).ToList();
                 }
                 else
                 {
-                    SpieleListe = SpieleListe.Where(x => Manager.GenreArrayToStringArray(x.Genrelist).Length >= 1).OrderByDescending(x => Manager.GenreArrayToStringArray(x.Genrelist)[0]).ToList();
+                    ShownGamelist = ShownGamelist.Where(x => Manager.GenreArrayToString(x.ListOfGenres).Length >= 1).OrderByDescending(x => Manager.GenreArrayToString(x.ListOfGenres)[0]).ToList();
                 }
             }
-            else if (modus == 2)
+            else if (FilterMode == 2)
             {
-                if (filterungsfolge == 0)
+                if (FilterDirection == 0)
                 {
-                    SpieleListe = SpieleListe.OrderBy(x => x.Genrelist.Length).ToList();
+                    ShownGamelist = ShownGamelist.OrderBy(x => x.ListOfGenres.Length).ToList();
                 }
                 else
                 {
-                    SpieleListe = SpieleListe.OrderByDescending(x => x.Genrelist.Length).ToList();
+                    ShownGamelist = ShownGamelist.OrderByDescending(x => x.ListOfGenres.Length).ToList();
                 }
             }
-            else if (modus == 3)
+            else if (FilterMode == 3)
             {
-                if (filterungsfolge == 0)
+                if (FilterDirection == 0)
                 {
-                    SpieleListe = OriginaleListe.OrderBy(x => x.Name).ToList();
+                    ShownGamelist = OriginalGamelist.OrderBy(x => x.Name).ToList();
                 }
                 else
                 {
-                    SpieleListe = OriginaleListe.OrderByDescending(x => x.Name).ToList();
+                    ShownGamelist = OriginalGamelist.OrderByDescending(x => x.Name).ToList();
                 }
             }
-            else if (modus == 4)
+            else if (FilterMode == 4)
             {
-                if (filterungsfolge == 0)
+                if (FilterDirection == 0)
                 {
-                    SpieleListe = OriginaleListe.OrderBy(x => x.Fav).ToList();
+                    ShownGamelist = OriginalGamelist.OrderBy(x => x.IsFavourite).ToList();
                 }
                 else
                 {
-                    SpieleListe = OriginaleListe.OrderByDescending(x => x.Fav).ToList();
+                    ShownGamelist = OriginalGamelist.OrderByDescending(x => x.IsFavourite).ToList();
                 }
             }
-            else if (modus == 5)
+            else if (FilterMode == 5)
             {
-                if (filterungsfolge == 0)
+                if (FilterDirection == 0)
                 {
-                    SpieleListe = OriginaleListe.OrderBy(x => x.Sterne).ToList();
+                    ShownGamelist = OriginalGamelist.OrderBy(x => x.ReviewStars).ToList();
                 }
                 else
                 {
-                    SpieleListe = OriginaleListe.OrderByDescending(x => x.Sterne).ToList();
+                    ShownGamelist = OriginalGamelist.OrderByDescending(x => x.ReviewStars).ToList();
                 }
             }
         }
 
-        public static string[] GenreArrayToStringArray(Genre[] genrelist)
+        public static string[] GenreArrayToString(LibraryGenre[] Genrelist)
         {
-            string[] result = Array.Empty<string>();
-            if (genrelist != null && genrelist.Length >= 1)
+            string[] GenreStringlist = Array.Empty<string>();
+            if (Genrelist != null && Genrelist.Length >= 1)
             {
-                result = genrelist.Select(a => a.Name).ToArray();
+                GenreStringlist = Genrelist.Select(a => a.Name).ToArray();
             }
-            return result;
+            return GenreStringlist;
         }
 
-        public static async Task MauiDialog(string title = "Window", string message = "Message", string buttontext = "OK")
+        public static async Task SimpleDialogMessage(string Title = "Window", string Message = "Message", string ButtonText = "OK")
         {
-            await Application.Current.MainPage.DisplayAlert(title, message, buttontext);
+            await Application.Current.MainPage.DisplayAlert(Title, Message, ButtonText);
         }
 
-        public static async Task<string> ReadStringFromFile(string pickername = "Datei wählen")
-        {
-            StringBuilder ret = new();
-
-            PickOptions options = new()
-            {
-                PickerTitle = pickername
-            };
-
-            try
-            {
-                FileResult result = await FilePicker.Default.PickAsync(options);
-                if (result != null)
-                {
-                    Stream stream = await result.OpenReadAsync();
-                    byte[] b = new byte[1024];
-
-                    UTF8Encoding temp = new(true);
-
-                    while (stream.Read(b, 0, b.Length) > 0)
-                    {
-                        ret.Append(temp.GetString(b));
-                    }
-
-                    stream.Flush();
-                    stream.Position = 0;
-                }
-                return ret.ToString();
-            }
-            catch (Exception ex)
-            {
-                // The user canceled or something went wrong
-            }
-
-            return ret.ToString();
-        }
-
-        public static async Task<FileResult> GetExecuteablePath(string pickername = "Spieldatei wählen")
+        public static async Task<FileResult> PickExecutablePath(string PickerTitle = "Choose the executable")
         {
             PickOptions options = new()
             {
-                PickerTitle = pickername
+                PickerTitle = PickerTitle
             };
 
             try
@@ -263,19 +242,17 @@ namespace BlazorLibrary.Management
             }
             catch (Exception ex)
             {
-                // The user canceled or something went wrong
             }
 
             return null;
         }
 
-        public static async Task<StreamReader> ReadStreamFromFile(string pickername = "Datei wählen")
+        public static async Task<StreamReader> GetStreamOfFile(string PickerTitle = "Choose a file")
         {
             StreamReader ret = null;
-
             PickOptions options = new()
             {
-                PickerTitle = pickername
+                PickerTitle = PickerTitle
             };
 
             try
@@ -293,36 +270,35 @@ namespace BlazorLibrary.Management
             }
             catch (Exception ex)
             {
-                // The user canceled or something went wrong
             }
 
             return ret;
         }
 
-        public static ApplicationSettings ReadJsonSettingsFile(string json)
+        public static T JsonToObject<T>(string JsonText)
         {
-            return JsonConvert.DeserializeObject<ApplicationSettings>(json);
+            return JsonConvert.DeserializeObject<T>(JsonText);
         }
 
-        public static string GetSettingsAsJson(ApplicationSettings settings)
+        public static string ObjectToJson(object ObjectInput)
         {
-            return JsonConvert.SerializeObject(settings, Formatting.Indented);
+            return JsonConvert.SerializeObject(ObjectInput, Formatting.Indented);
         }
 
-        public static void StartExe(string exepfad)
+        public static void TryToCallExecutable(string exepfad)
         {
-            ProcessStartInfo startInfo = new()
+            ProcessStartInfo ProcessValues = new()
             {
                 CreateNoWindow = true,
-
                 WorkingDirectory = $"C:\\users\\{Environment.UserName}\\Desktop\\",
-                UseShellExecute = true,
 
+                UseShellExecute = true,
                 FileName = exepfad,
+
                 WindowStyle = ProcessWindowStyle.Hidden
             };
 
-            using Process process = Process.Start(startInfo);
+            using Process process = Process.Start(ProcessValues);
             process.Start();
         }
     }

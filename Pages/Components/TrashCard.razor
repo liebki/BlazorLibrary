@@ -1,0 +1,24 @@
+﻿<MudCard Elevation=3 Class="mt-3 mx-2" Style="min-width: 18rem; max-width:22%">
+    <MudCardHeader>
+
+        <CardHeaderContent>
+            <MudText Typo="Typo.button">@GameOfCard.Name</MudText>
+        </CardHeaderContent>
+
+    </MudCardHeader>
+
+    <MudImage Class="rounded-1" Elevation=1 Fluid="true" Src="@GameOfCard.ImageUrl" />
+
+    <MudCardActions Class="justify-content-center">
+
+        <MudTooltip Text="Restore to library">
+            <MudIconButton OnClick="RecoverGame" Icon="@Icons.Material.Filled.Restore" Color="Color.Dark" />
+        </MudTooltip>
+
+        <MudTooltip Text="Delete forever">
+            <MudIconButton OnClick="DeleteGameFull" Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Dark" />
+        </MudTooltip>
+
+    </MudCardActions>
+
+</MudCard>

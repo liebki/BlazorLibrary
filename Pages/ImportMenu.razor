@@ -1,8 +1,3 @@
-@inject IJSRuntime JS
-@inject NavigationManager navMan
-@inject SQLiteManager _db
-@inject CsvManager csvMan
-
 @page "/fileimport"
 
 <LoginCheck />
@@ -10,12 +5,12 @@
 <MudText Typo="Typo.h4">Importmenu</MudText>
 
 <div class="input-group mb-3">
-    <MudTextField @bind-Value="spielcsv_state" Label="Choose a .csv file containing game data" ReadOnly="true" Variant="Variant.Text" />
-    <MudButton OnClick="() => SelectImportCsv(ImportType.Spiel)" Variant="Variant.Filled" Color="Color.Primary">Select</MudButton>
+    <MudTextField @bind-Value="GameCsvPlaceholder" Label="Choose a .csv file containing game data" ReadOnly="true" Variant="Variant.Text" />
+    <MudButton OnClick="() => SelectImportCsv(ImportType.Game)" Variant="Variant.Filled" Color="Color.Primary">Select</MudButton>
 </div>
 
 <div class="input-group mb-3">
-    <MudTextField @bind-Value="genrecsv_state" Label="Choose a .csv file containing genre data" ReadOnly="true" Variant="Variant.Text" />
+    <MudTextField @bind-Value="GenreCsvPlaceholder" Label="Choose a .csv file containing genre data" ReadOnly="true" Variant="Variant.Text" />
     <MudButton OnClick="() => SelectImportCsv(ImportType.Genre)" Variant="Variant.Filled" Color="Color.Primary">Select</MudButton>
 </div>
 

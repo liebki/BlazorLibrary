@@ -1,24 +1,29 @@
-@inject SQLiteManager _db
-
 @page "/settings"
 
 <div>
     <MudText Typo="Typo.h4">BlazorLibrary Settings</MudText>
     
-    <MudTextField @bind-Value="EinstellungenBackup.Sqlitedatabasename" Class="mt-3" Placeholder="What should the database be called?" T="string" Label="Database name" />
+    <MudTextField @bind-Value="EinstellungenBackup.Databasename" Class="mt-3" Placeholder="What should the database be called?" T="string" Label="Database name" />
 
-    <MudTextField @bind-Value="EinstellungenBackup.Rawgapikey" InputType="ShowHideState" Placeholder="The Key for the Rawg API" T="string" Label="Rawg Api-Key" />
+    <MudTextField @bind-Value="EinstellungenBackup.RawgApikey" InputType="ShowHideState" Placeholder="The Key for the Rawg API" T="string" Label="Rawg Api-Key" />
 
     <MudForm>
         <MudButton Class="mt-2" OnClick="ShowHideApiKey" Variant="Variant.Filled" Color="ShowHideButtonColor">@ShowHideButtonText</MudButton>
         <MudButton Class="mt-2" Href="https://rawg.io/apidocs" Variant="Variant.Filled" Color="Color.Info">Get Api-Key</MudButton>
     </MudForm>
     
-    <MudCheckBox Dense @bind-Checked="EinstellungenBackup.Userawg" Class="mt-3" Label="Should the Rawg API be used or not?" T="bool" />
+    <MudCheckBox Dense @bind-Checked="EinstellungenBackup.UseRawg" Class="mt-3" Label="Should the Rawg API be used or not?" T="bool" />
 
-    <MudTextField @bind-Value="EinstellungenBackup.Pricescraperuseragent" Class="mt-3" Placeholder="The Useragent, that is used to query the price" T="string" Label="Useragent for pricescraping" />
+    <MudTextField @bind-Value="EinstellungenBackup.PriceScraperUseragent" Class="mt-3" Placeholder="The Useragent, that is used to query the price" T="string" Label="Useragent for pricescraping" />
 
-    <MudCheckBox Dense @bind-Checked="EinstellungenBackup.Usepricescraper" Class="mt-3" Label="Should the price scraper be used or not?" T="bool" />
+    <MudCheckBox Dense @bind-Checked="EinstellungenBackup.UsePriceScraper" Class="mt-3" Label="Should the price scraper be used or not?" T="bool" />
+
+    <MudCheckBox Dense @bind-Checked="EinstellungenBackup.UseColoredNavMenu" Class="mt-3" Label="Do you want the fade/colored NavMenu?" T="bool" />
+
+    <MudCheckBox Dense @bind-Checked="EinstellungenBackup.UseCustomNavMenuColor" Class="mt-3" Label="Do you want to use a custom color for the NavMenu?" T="bool" />
+    
+    <MudTextField @bind-Value="EinstellungenBackup.CustomColorCode" Class="mt-3" Placeholder="The custom colorcode, to use for the NavMenu (ex. #2196f3)" T="string" Label="Useragent for pricescraping" />
+
 </div>
 
 <MudDivider />
