@@ -2,10 +2,11 @@
 using MudBlazor;
 
 using System.Text;
+using NavigationManagerUtils;
+
 using BlazorLibrary.Management;
 
 using Microsoft.AspNetCore.Components;
-
 using BlazorLibrary.Models.Application;
 
 namespace BlazorLibrary.Pages
@@ -13,7 +14,7 @@ namespace BlazorLibrary.Pages
     partial class Settings
     {
         [Inject]
-        private NavigationManager NavMan { get; set; }
+        private NavManUtils NavMan { get; set; }
 
         private MudBlazor.Color ShowHideButtonColor { get; set; } = MudBlazor.Color.Warning;
         private InputType ShowHideState { get; set; } = InputType.Password;
@@ -134,7 +135,7 @@ namespace BlazorLibrary.Pages
                 Environment.Exit(0);
             }
 
-            NavMan.NavigateTo("/settings", true);
+            NavMan.Reload();
         }
     }
 }

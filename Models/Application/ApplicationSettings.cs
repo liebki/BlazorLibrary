@@ -47,6 +47,5 @@ namespace BlazorLibrary.Models.Application
             }
             return false;
         }
-
     }
 }

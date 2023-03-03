@@ -1,7 +1,8 @@
 ﻿using BlazorLibrary.Data;
 using BlazorLibrary.Models;
-using BlazorLibrary.Management;
+using NavigationManagerUtils;
 
+using BlazorLibrary.Management;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages
@@ -12,7 +13,7 @@ namespace BlazorLibrary.Pages
         public SqliteDatabaseManager DatabaseMan { get; set; }
 
         [Inject]
-        public NavigationManager NavigationMan { get; set; }
+        public NavManUtils NavMan { get; set; }
 
         public IEnumerable<LibraryGenre> GenreForGame { get; set; } = new List<LibraryGenre>();
         public LibraryGenre[] AvailableGenres { get; set; }
@@ -47,7 +48,7 @@ namespace BlazorLibrary.Pages
                     await DatabaseMan.SaveGenresOfGame(GameId, GenreForGame);
                 }
                 await Manager.SimpleDialogMessage("Information", $"You created the game {Name}");
-                NavigationMan.NavigateTo("/games", true);
+                NavMan.Navigate("/games");
             }
             else
             {

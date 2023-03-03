@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using NavigationManagerUtils;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages.Components
@@ -11,6 +6,6 @@ namespace BlazorLibrary.Pages.Components
     partial class LoginCheck
     {
         [Inject]
-        public NavigationManager NavigationMan { get; set; }
+        public NavManUtils NavMan { get; set; }
     }
 }

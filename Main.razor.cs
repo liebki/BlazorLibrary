@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using NavigationManagerUtils;
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary
 {
     partial class Main
     {
         [Inject]
-        private NavigationManager NavigationMan { get; set; }
+        private NavManUtils NavMan { get; set; }
 
         protected void BackToStart()
         {
-            NavigationMan.NavigateTo("/", true);
+            NavMan.Navigate("/");
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿
 using RawgNET.Models;
+
 using Newtonsoft.Json;
 using System.Reflection;
 
 using System.Diagnostics;
 using BlazorLibrary.Data;
+
 using BlazorLibrary.Models;
 
 using BlazorLibrary.Models.User;
@@ -32,6 +34,7 @@ namespace BlazorLibrary.Management
 
             return (ExecutablePath, false);
         }
+
         public static bool DoesStringContainCharacters(string Input)
         {
             foreach (char c in Input)

@@ -70,6 +70,9 @@ A library for games, created using .NET Core 7.0 with MAUI (Blazor)!
 
 You have to download the whole project, MAUI and visual studio are not able to produce a good exportable build right now yet
 
+### Or download the project, build it using following command (still too big tho):
+- dotnet publish -f net7.0-windows10.0.19041.0 -c Release -p:WindowsPackageType=None
+
 ## FAQ
 
 #### Does this work on every OS?

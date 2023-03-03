@@ -1,6 +1,7 @@
 ﻿using BlazorLibrary.Data;
 using BlazorLibrary.Models;
 
+using NavigationManagerUtils;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages.Components
@@ -11,7 +12,7 @@ namespace BlazorLibrary.Pages.Components
         public SqliteDatabaseManager DatabaseMan { get; set; }
 
         [Inject]
-        public NavigationManager NavigationMan { get; set; }
+        public NavManUtils NavMan { get; set; }
 
         [Parameter]
         public LibraryGame GameOfCard { get; set; }
@@ -19,7 +20,7 @@ namespace BlazorLibrary.Pages.Components
         private async Task RecoverGame()
         {
             await DatabaseMan.ChangeDeletionStateOfGame(GameOfCard, false);
-            NavigationMan.NavigateTo("/games", true);
+            NavMan.Navigate("/games");
         }
 
         private async Task DeleteGameFull()
@@ -28,7 +29,7 @@ namespace BlazorLibrary.Pages.Components
             await DatabaseMan.DeleteGame(GameOfCard);
 
             await DatabaseMan.DeleteComment(GameOfCard.Id, GameOfCard.Comment.Id);
-            NavigationMan.NavigateTo("/games", true);
+            NavMan.Navigate("/games");
         }
     }
 }

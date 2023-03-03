@@ -2,8 +2,9 @@
 
 using BlazorLibrary.Data;
 using BlazorLibrary.Models;
-using BlazorLibrary.Management;
+using NavigationManagerUtils;
 
+using BlazorLibrary.Management;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages
@@ -14,7 +15,7 @@ namespace BlazorLibrary.Pages
         public SqliteDatabaseManager DatabaseMan { get; set; }
 
         [Inject]
-        public NavigationManager NavigationMan { get; set; }
+        public NavManUtils NavMan { get; set; }
 
         [Parameter]
         [SupplyParameterFromQuery]
@@ -46,7 +47,7 @@ namespace BlazorLibrary.Pages
             await DatabaseMan.RenameGenreEntry(GenreToUpdate);
             await Manager.SimpleDialogMessage("Information", $"You renamed the genre to {GenreToUpdate.Name}");
 
-            NavigationMan.NavigateTo("/genres", true);
+            NavMan.Reload();
         }
 
         public async Task CreateGenre()
@@ -91,7 +92,7 @@ namespace BlazorLibrary.Pages
                     await DatabaseMan.DeleteGenreInDatabase(SelectedGenres);
                     await Manager.SimpleDialogMessage("Information", $"{msg} {GenreNamen}");
 
-                    NavigationMan.NavigateTo("/genres", true);
+                    NavMan.Reload();
                     await CollectData();
                 }
                 else

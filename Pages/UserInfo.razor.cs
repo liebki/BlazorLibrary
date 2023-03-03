@@ -1,7 +1,8 @@
 ﻿using BlazorLibrary.Data;
+using NavigationManagerUtils;
 using BlazorLibrary.Management;
-using BlazorLibrary.Models.User;
 
+using BlazorLibrary.Models.User;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages
@@ -9,7 +10,7 @@ namespace BlazorLibrary.Pages
     partial class UserInfo
     {
         [Inject]
-        private NavigationManager NavigationMan { get; set; }
+        private NavManUtils NavMan { get; set; }
 
         [Inject]
         private SqliteDatabaseManager DatabaseMan { get; set; }
@@ -99,13 +100,13 @@ namespace BlazorLibrary.Pages
             UserNick = string.Empty;
             UserPas = string.Empty;
 
-            NavigationMan.NavigateTo("/", true);
+            NavMan.Reload();
         }
 
         private void TryUserLogout()
         {
             Manager.ClearActiveLibraryUser();
-            NavigationMan.NavigateTo("/", true);
+            NavMan.Reload();
         }
     }
 }

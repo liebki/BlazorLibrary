@@ -1,10 +1,11 @@
-﻿using MudBlazor;
+﻿
+using MudBlazor;
+using BlazorLibrary.Data;
 
 using BlazorLibrary.Models;
 
+using NavigationManagerUtils;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
-using BlazorLibrary.Data;
 
 namespace BlazorLibrary.Pages.Components
 {
@@ -14,18 +15,18 @@ namespace BlazorLibrary.Pages.Components
         public SqliteDatabaseManager DatabaseMan { get; set; }
 
         [Inject]
-        public NavigationManager NavigationMan { get; set; }
+        public NavManUtils NavMan { get; set; }
 
         [Inject]
         private IDialogService DialogService { get; set; }
-        [Parameter]
 
+        [Parameter]
         public LibraryGame GameOfCard { get; set; }
 
         private async Task MoveGameToTrashcan()
         {
             await DatabaseMan.ChangeDeletionStateOfGame(GameOfCard, true);
-            NavigationMan.NavigateTo("/games", true);
+            NavMan.Navigate("/games");
         }
 
         private async Task ChangeFavouriteState(bool wert)

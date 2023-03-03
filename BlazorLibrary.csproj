@@ -20,6 +20,12 @@
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+        <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+        <AppxPackageDir>C:\Users\cia\Desktop\BlazorLibraryMaui\</AppxPackageDir>
+        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>-->
     </PropertyGroup>
@@ -28,8 +34,9 @@
 		<PackageReference Include="CsvHelper" Version="30.0.1" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
 		<PackageReference Include="MMOGANet" Version="0.0.2" />
-		<PackageReference Include="MudBlazor" Version="6.1.7" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+		<PackageReference Include="MudBlazor" Version="6.1.9" />
+		<PackageReference Include="NavigationManagerUtils" Version="0.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3-beta1" />
 		<PackageReference Include="RawgNET" Version="0.0.9" />
 		<PackageReference Include="System.Data.SQLite" Version="1.0.117" />
 	</ItemGroup>

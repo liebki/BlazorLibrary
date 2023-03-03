@@ -1,5 +1,7 @@
 ﻿using BlazorLibrary.Data;
 using MudBlazor.Services;
+using NavigationManagerUtils;
+
 using BlazorLibrary.Management;
 
 using Microsoft.Extensions.Logging;
@@ -38,6 +40,7 @@ namespace BlazorLibrary
             builder.Services.AddSingleton<SqliteDatabaseManager>();
             builder.Services.AddSingleton<CsvManager>();
 
+            builder.Services.AddTransient<NavManUtils>();
             builder.Services.AddSingleton<RawgNetManager>();
         }
 

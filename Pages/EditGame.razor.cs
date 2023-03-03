@@ -1,7 +1,8 @@
 ﻿using BlazorLibrary.Data;
 using BlazorLibrary.Models;
-using BlazorLibrary.Management;
+using NavigationManagerUtils;
 
+using BlazorLibrary.Management;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorLibrary.Pages
@@ -12,7 +13,7 @@ namespace BlazorLibrary.Pages
         public SqliteDatabaseManager DatabaseMan { get; set; }
 
         [Inject]
-        public NavigationManager NavigationMan { get; set; }
+        public NavManUtils NavMan { get; set; }
 
         [Parameter]
         public string GameId { get; set; }
@@ -37,7 +38,7 @@ namespace BlazorLibrary.Pages
             await DatabaseMan.ClearGenresOfGame(GameToUpdate.Id);
 
             await DatabaseMan.SaveGenresOfGame(GameToUpdate.Id, GenresToAdd);
-            NavigationMan.NavigateTo("/games", true);
+            NavMan.Navigate("/games");
 
             await Manager.SimpleDialogMessage("Information", $"You edited the game {GameToUpdate.Name}");
         }
