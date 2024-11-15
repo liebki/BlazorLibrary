@@ -98,10 +98,6 @@ You can apply (get a key) here: https://rawg.io/apidocs
 
 [GNU](https://choosealicense.com/licenses/gpl-3.0/)
 
-## Screenshots
-
-![Library Example Picture](https://kmliebl.de/blazorlibraryscreenshots/blazorlibrary-maui.PNG)
-
 ## Roadmap
 
 - Internal cleaning and code reduction
